@@ -3,6 +3,8 @@ from pathlib import Path
 import logging
 from shutil import copy
 
+ROOT_DIR = Path("logs")
+
 
 def parse_args():
     parser = ArgumentParser()
@@ -19,7 +21,7 @@ def sync_logs(directory: Path):
             logging.error(f"unexpected filename: {f.name}")
             continue
         year, month, day = parts[:3]
-        subdir = Path(year) / month / day
+        subdir = ROOT_DIR / year / month / day
         subdir.mkdir(parents=True, exist_ok=True)
         copy(f, subdir)
 
