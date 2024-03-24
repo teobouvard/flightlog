@@ -1,0 +1,2 @@
+*.igc filter=lfs diff=lfs merge=lfs -text
+*.IGC filter=lfs diff=lfs merge=lfs -text
