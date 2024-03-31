@@ -1,4 +1,5 @@
 use std::{
+    fmt::{self, Display},
     fs::File,
     io::{BufRead, BufReader},
 };
@@ -6,24 +7,29 @@ use std::{
 use chrono::{NaiveDate, NaiveTime};
 
 #[derive(Debug)]
-enum IgcHeaderEntry {
+pub enum IgcHeaderEntry {
     Date { date: NaiveDate },
     Unsupported { record: String },
 }
-#[derive(Debug)]
-struct IgcHeader {
-    date: NaiveDate,
-}
 
 #[derive(Debug)]
-struct IgcFix {
-    ts: NaiveTime,
+pub struct IgcFix {
+    pub ts: NaiveTime,
+    pub lat: f32,
+    pub lon: f32,
+    pub alt: f32,
 }
 
 #[derive(Debug)]
 pub struct IgcFile {
-    header: Vec<IgcHeaderEntry>,
-    fixes: Vec<IgcFix>,
+    pub header: Vec<IgcHeaderEntry>,
+    pub fixes: Vec<IgcFix>,
+}
+
+impl Display for IgcFile {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} fixes", self.fixes.len())
+    }
 }
 
 fn read_igc_record_h(record: String) -> IgcHeaderEntry {
@@ -43,6 +49,9 @@ fn read_igc_record_b(record: String) -> IgcFix {
         ts: NaiveTime::parse_from_str(&record[1..7], "%H%M%S").unwrap_or_else(|err| {
             panic!("Could not parse record timestamp from {}: {}", record, err)
         }),
+        lat: 0.0,
+        lon: 0.0,
+        alt: 0.0,
     }
 }
 
