@@ -2,6 +2,7 @@ use std::{
     fmt::{self, Display},
     fs::File,
     io::{BufRead, BufReader},
+    num::ParseFloatError,
 };
 
 use chrono::{NaiveDate, NaiveTime};
@@ -44,12 +45,36 @@ fn read_igc_record_h(record: String) -> IgcHeaderEntry {
     }
 }
 
+fn read_lat_degrees(record: &str) -> Result<f32, ParseFloatError> {
+    let degrees: f32 = record[0..2].parse()?;
+    let milliminutes: f32 = record[2..7].parse()?;
+    let total_degrees = degrees + (milliminutes / 60_000.0);
+    match record.chars().last() {
+        Some('N') => Ok(total_degrees),
+        Some('S') => Ok(-total_degrees),
+        _ => panic!("invalid latitude"),
+    }
+}
+
+fn read_lon_degrees(record: &str) -> Result<f32, ParseFloatError> {
+    let degrees: f32 = record[0..3].parse()?;
+    let milliminutes: f32 = record[3..8].parse()?;
+    let total_degrees = degrees + (milliminutes / 60_000.0);
+    match record.chars().last() {
+        Some('E') => Ok(total_degrees),
+        Some('W') => Ok(-total_degrees),
+        _ => panic!("invalid longitude"),
+    }
+}
+
 fn read_igc_record_b(record: String) -> IgcFix {
     IgcFix {
         ts: NaiveTime::parse_from_str(&record[1..7], "%H%M%S")
             .unwrap_or_else(|err| panic!("Could not parse timestamp from {}: {}", record, err)),
-        lat: 0.0,
-        lon: 0.0,
+        lat: read_lat_degrees(&record[7..15])
+            .unwrap_or_else(|err| panic!("Could not parse latitude from {}: {}", record, err)),
+        lon: read_lon_degrees(&record[15..24])
+            .unwrap_or_else(|err| panic!("Could not parse longitude from {}: {}", record, err)),
         alt: record[30..35]
             .parse()
             .unwrap_or_else(|err| panic!("Could not parse altitude from {}: {}", record, err)),
