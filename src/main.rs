@@ -17,5 +17,5 @@ fn main() {
 
     let file = File::open(args.input).expect("Could not find input file");
     let contents = igc::read_igc(file);
-    dbg!(contents);
+    println!("{}", contents);
 }
