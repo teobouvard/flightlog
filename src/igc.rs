@@ -17,7 +17,7 @@ pub struct IgcFix {
     pub ts: NaiveTime,
     pub lat: f32,
     pub lon: f32,
-    pub alt: f32,
+    pub alt: i32,
 }
 
 #[derive(Debug)]
@@ -46,12 +46,13 @@ fn read_igc_record_h(record: String) -> IgcHeaderEntry {
 
 fn read_igc_record_b(record: String) -> IgcFix {
     IgcFix {
-        ts: NaiveTime::parse_from_str(&record[1..7], "%H%M%S").unwrap_or_else(|err| {
-            panic!("Could not parse record timestamp from {}: {}", record, err)
-        }),
+        ts: NaiveTime::parse_from_str(&record[1..7], "%H%M%S")
+            .unwrap_or_else(|err| panic!("Could not parse timestamp from {}: {}", record, err)),
         lat: 0.0,
         lon: 0.0,
-        alt: 0.0,
+        alt: record[30..35]
+            .parse()
+            .unwrap_or_else(|err| panic!("Could not parse altitude from {}: {}", record, err)),
     }
 }
 
