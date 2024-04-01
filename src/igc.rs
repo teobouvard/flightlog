@@ -6,6 +6,7 @@ use std::{
 };
 
 use chrono::{NaiveDate, NaiveTime};
+use serde::Serialize;
 
 #[derive(Debug)]
 pub enum IgcHeaderEntry {
@@ -13,7 +14,7 @@ pub enum IgcHeaderEntry {
     Unsupported { record: String },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct IgcFix {
     pub ts: NaiveTime,
     pub lat: f32,
@@ -45,7 +46,7 @@ impl IgcFile {
         Self { header, fixes }
     }
 
-    pub fn get_date(self) -> Option<NaiveDate> {
+    pub fn get_date(&self) -> Option<NaiveDate> {
         self.header
             .iter()
             .find_map(|header| match header {
