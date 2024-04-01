@@ -1,8 +1,11 @@
 use std::{fs::File, path::PathBuf};
+mod flight;
 mod igc;
 
 use clap::{Parser, Subcommand};
 use glob::{glob_with, MatchOptions};
+
+use crate::{flight::Flight, igc::IgcFile};
 
 #[derive(Parser)]
 #[command(version, arg_required_else_help = true)]
@@ -35,8 +38,8 @@ fn cmd_compile(input: PathBuf) {
     .expect("Invalid search pattern")
     {
         let file = File::open(entry.unwrap()).expect("Could not open file");
-        let contents = igc::read_igc(file);
-        println!("{}", contents);
+        let flight = Flight::new(IgcFile::new(file));
+        println!("{}", flight.to_json().expect("Could not serialize JSON"));
     }
 }
 
