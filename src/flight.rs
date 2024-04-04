@@ -1,9 +1,4 @@
-use std::{
-    fmt::Display,
-    fs::{self, File},
-    io::{self, BufWriter},
-    path::PathBuf,
-};
+use std::fmt::Display;
 
 use chrono::NaiveDate;
 use serde::Serialize;
@@ -24,12 +19,8 @@ impl Flight {
         }
     }
 
-    pub fn write_json(&self, output: PathBuf) -> io::Result<()> {
-        fs::create_dir_all(output.parent().expect("Invalid directory"))?;
-        let handle = File::create(output)?;
-        let writer = BufWriter::new(handle);
-        serde_json::to_writer(writer, self)?;
-        Ok(())
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(&self)
     }
 }
 
