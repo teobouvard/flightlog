@@ -7,9 +7,11 @@
 </head>
 
 <body>
-<script>
-    const index_data = {{ data }};
-</script>
+    <ul>
+        {% for entry in index.entries %}
+            <li><a href="{{entry.link}}">{{entry.link}}</a></li>
+        {% endfor %}
+    </ul>
 </body>
 
 </html>
