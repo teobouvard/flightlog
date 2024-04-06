@@ -1,16 +1,15 @@
-use std::{
-    fs::{self, File},
-    io::{BufWriter, Write},
-    path::PathBuf,
-};
 mod flight;
 mod igc;
+mod ui;
+
+use std::fs::File;
+use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 use glob::{glob_with, MatchOptions};
-use tera::{Context, Tera};
+use ui::{FlightPage, IndexEntry};
 
-use crate::{flight::Flight, igc::IgcFile};
+use crate::{flight::Flight, igc::IgcFile, ui::IndexPage};
 
 #[derive(Parser)]
 #[command(version, arg_required_else_help = true)]
@@ -34,8 +33,7 @@ enum Commands {
 }
 
 fn cmd_compile(input: PathBuf, output: PathBuf) {
-    let mut tera = Tera::new("src/templates/**/*.html").expect("Could not initialize templates");
-    tera.autoescape_on(vec![]);
+    let mut index = IndexPage::default();
 
     for entry in glob_with(
         input
@@ -51,21 +49,14 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
     {
         let filename = entry.unwrap();
         let file = File::open(&filename).expect("Could not open file");
-        let flight = Flight::new(IgcFile::new(file));
-        let mut context = Context::new();
-        context.insert("data", &flight.to_json().expect("Could not write JSON"));
-        let result = tera
-            .render("flight.html", &context)
-            .expect("Could not render template");
-        let output_file = output.join(filename.with_extension("html"));
-        fs::create_dir_all(output_file.parent().expect("Invalid directory"))
-            .expect("Could not create directory");
-        let handle = File::create(output_file).expect("Could not create output file");
-        let mut writer = BufWriter::new(handle);
-        writer
-            .write_all(result.as_bytes())
-            .expect("Coult not write rendered template");
+        let page = FlightPage::new(Flight::new(IgcFile::new(file)));
+        page.render(&output);
+
+        let entry = IndexEntry::new(page.get_link());
+        index.entries.push(entry);
     }
+
+    index.render(&output);
 }
 
 fn main() {
