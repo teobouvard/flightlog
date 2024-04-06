@@ -8,13 +8,15 @@ use std::{
 use chrono::{NaiveDate, NaiveTime};
 use serde::Serialize;
 
+use crate::datetime::Duration;
+
 #[derive(Debug)]
 pub enum IgcHeaderEntry {
     Date { date: NaiveDate },
     Unsupported { record: String },
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 pub struct IgcFix {
     pub ts: NaiveTime,
     pub lat: f32,
@@ -54,6 +56,10 @@ impl IgcFile {
                 _ => None,
             })
             .copied()
+    }
+
+    pub fn duration(&self) -> Duration {
+        Duration::new(self.fixes.last().unwrap().ts - self.fixes.first().unwrap().ts)
     }
 
     fn read_igc_record_h(record: String) -> IgcHeaderEntry {
