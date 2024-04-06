@@ -61,11 +61,8 @@ pub struct FlightPage {
 }
 
 impl FlightPage {
-    pub fn new(day_index: i8, flight: Flight) -> Self {
-        Self {
-            date_index: day_index,
-            flight,
-        }
+    pub fn new(date_index: i8, flight: Flight) -> Self {
+        Self { date_index, flight }
     }
 
     pub fn get_link(&self) -> PathBuf {
