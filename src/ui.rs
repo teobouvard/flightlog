@@ -3,6 +3,7 @@ use std::io::Write;
 use std::path::Path;
 use std::{fs::File, io::BufWriter, path::PathBuf};
 
+use chrono::NaiveDate;
 use once_cell::sync::Lazy;
 use serde::Serialize;
 use tera::{Context, Tera};
@@ -15,14 +16,15 @@ pub static TEMPLATES: Lazy<Tera> = Lazy::new(|| {
     tera
 });
 
-#[derive(Serialize)]
+#[derive(Serialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct IndexEntry {
+    date: NaiveDate,
     link: PathBuf,
 }
 
 impl IndexEntry {
-    pub fn new(link: PathBuf) -> Self {
-        Self { link }
+    pub fn new(date: NaiveDate, link: PathBuf) -> Self {
+        Self { date, link }
     }
 }
 
@@ -36,8 +38,9 @@ impl IndexPage {
         Self { entries: vec![] }
     }
 
-    pub fn render(&self, output: &Path) {
+    pub fn render(&mut self, output: &Path) {
         let mut context = Context::new();
+        self.entries.reverse();
         context.insert("index", &self);
         let result = TEMPLATES
             .render("index.html", &context)

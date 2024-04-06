@@ -63,7 +63,7 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
         let page = FlightPage::new(date_index, flight);
         page.render(&output);
 
-        let entry = IndexEntry::new(page.get_link());
+        let entry = IndexEntry::new(date_current, page.get_link());
         index.entries.push(entry);
     }
 
