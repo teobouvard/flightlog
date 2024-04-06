@@ -38,10 +38,7 @@ impl IndexPage {
 
     pub fn render(&self, output: &Path) {
         let mut context = Context::new();
-        context.insert(
-            "data",
-            &serde_json::to_string(self).expect("Could not serialize index"),
-        );
+        context.insert("index", &self);
         let result = TEMPLATES
             .render("index.html", &context)
             .expect("Could not render index template");
@@ -65,18 +62,13 @@ impl FlightPage {
     }
 
     pub fn get_link(&self) -> PathBuf {
+        // TODO Distinguish flights on the same day.
         PathBuf::from(self.flight.date.format("%Y/%m/%d").to_string()).with_extension("html")
     }
 
     pub fn render(&self, output: &Path) {
         let mut context = Context::new();
-        context.insert(
-            "data",
-            &self
-                .flight
-                .to_json()
-                .expect("Could not serialize flight JSON"),
-        );
+        context.insert("flight", &self.flight);
         let result = TEMPLATES
             .render("flight.html", &context)
             .expect("Could not render flight template");
