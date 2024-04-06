@@ -53,17 +53,25 @@ impl IndexPage {
 
 #[derive(Serialize)]
 pub struct FlightPage {
+    date_index: i8,
     flight: Flight,
 }
 
 impl FlightPage {
-    pub fn new(flight: Flight) -> Self {
-        Self { flight }
+    pub fn new(day_index: i8, flight: Flight) -> Self {
+        Self {
+            date_index: day_index,
+            flight,
+        }
     }
 
     pub fn get_link(&self) -> PathBuf {
-        // TODO Distinguish flights on the same day.
-        PathBuf::from(self.flight.date.format("%Y/%m/%d").to_string()).with_extension("html")
+        PathBuf::from(format!(
+            "{}-{}",
+            self.flight.date.format("%Y/%m/%d"),
+            self.date_index
+        ))
+        .with_extension("html")
     }
 
     pub fn render(&self, output: &Path) {

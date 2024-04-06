@@ -5,6 +5,7 @@ mod ui;
 use std::fs::File;
 use std::path::PathBuf;
 
+use chrono::NaiveDate;
 use clap::{Parser, Subcommand};
 use glob::{glob_with, MatchOptions};
 use ui::{FlightPage, IndexEntry};
@@ -34,6 +35,8 @@ enum Commands {
 
 fn cmd_compile(input: PathBuf, output: PathBuf) {
     let mut index = IndexPage::default();
+    let mut date_current = NaiveDate::default();
+    let mut date_index = 0;
 
     for entry in glob_with(
         input
@@ -49,7 +52,15 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
     {
         let filename = entry.unwrap();
         let file = File::open(&filename).expect("Could not open file");
-        let page = FlightPage::new(Flight::new(IgcFile::new(file)));
+
+        let flight = Flight::new(IgcFile::new(file));
+        if flight.date == date_current {
+            date_index += 1;
+        } else {
+            date_current = flight.date;
+            date_index = 0;
+        }
+        let page = FlightPage::new(date_index, flight);
         page.render(&output);
 
         let entry = IndexEntry::new(page.get_link());
