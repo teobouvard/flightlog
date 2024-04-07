@@ -1,41 +1,42 @@
 <!DOCTYPE html>
 <html>
 
-<head>
+  <head>
     <meta charset="UTF-8" />
     <title>flight</title>
+
+    <script src="https://unpkg.com/deck.gl@^9.0.0-beta.5/dist.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.css" />
-    <!-- <script src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"></script> -->
-    <script src="http://0.0.0.0:8081/maplibre-gl-dev.js" ></script>
+    <script src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"></script>
     <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+      }
 
-        #map {
-            flex-grow: 1;
-        }
+      #map {
+        flex-grow: 1;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>{{ flight.date }}</h1>
     <p>{{ flight.duration }}</p>
     <div id="map"></div>
-</body>
+  </body>
 
-<script defer>
+  <script defer>
     // This key is domain-restricted, don't even try.
     const API_KEY = "J9HxCuZ903G6MABPdFn6";
     const map = (window.map = new maplibregl.Map({
         container: "map",
         zoom: 12,
         center: {{ flight.geojson["coordinates"][0] }},
-        pitch: 52,
+        pitch: 50,
         hash: true,
         style: {
             version: 8,
@@ -79,7 +80,7 @@
             }
         },
         maxZoom: 18,
-        maxPitch: 85
+        maxPitch: 80
     }));
 
     map.addControl(new maplibregl.FullscreenControl());
@@ -99,25 +100,25 @@
         })
     );
 
-    map.on("load", () => {
-        map.addSource("tracklog", {
-            "type": "geojson",
-            "data": {{ flight.geojson | json_encode() }},
-        });
-        map.addLayer({
-            "id": "tracklog",
-            "type": "line",
-            "source": "tracklog",
-            "layout": {
-                "line-join": "round",
-                "line-cap": "round"
-            },
-            "paint": {
-                "line-color": "red",
-                "line-width": 2
-            }
-        });
-    });
-</script>
+    const {MapboxOverlay, PathLayer} = deck;
+    const deckOverlay = new MapboxOverlay({
+        interleaved: true,
+        layers: [
+            new PathLayer({
+                id: "PathLayer",
+                data: [{{ flight.geojson | json_encode() }}],
+                getColor: [255, 0, 0],
+                getPath: d => d["coordinates"],
+                capRounded: true,
+                jointRounded: true,
+                widthMinPixels: 1,
+                widthMaxPixels: 5,
+                billboard: true,
+            })
+        ]
+      });
+
+      map.addControl(deckOverlay);
+  </script>
 
 </html>
