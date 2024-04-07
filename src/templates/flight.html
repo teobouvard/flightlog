@@ -5,7 +5,8 @@
     <meta charset="UTF-8" />
     <title>flight</title>
     <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.css" />
-    <script src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"></script>
+    <!-- <script src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"></script> -->
+    <script src="http://0.0.0.0:8081/maplibre-gl-dev.js" ></script>
     <style>
         html,
         body {
@@ -33,7 +34,7 @@
     const map = (window.map = new maplibregl.Map({
         container: "map",
         zoom: 12,
-        center: {{ flight.geojson["features"][0]["geometry"]["coordinates"][0] }},
+        center: {{ flight.geojson["coordinates"][0] }},
         pitch: 52,
         hash: true,
         style: {
@@ -112,23 +113,8 @@
                 "line-cap": "round"
             },
             "paint": {
-                "line-color": "#888",
-                "line-width": 8
-            }
-        });
-        map.addLayer({
-            "id": "tracklog-extrusion",
-            "type": "fill-extrusion",
-            "source": "tracklog",
-            "paint": {
-                // See the MapLibre Style Specification for details on data expressions.
-                // https://maplibre.org/maplibre-style-spec/expressions/
-                "fill-extrusion-color": "red",
-                // Get fill-extrusion-base from the source "z" property.
-                "fill-extrusion-base": ["get", "z"],
-                "fill-extrusion-height": ["+", ["get", "z"], 10],
-                // Make extrusions slightly opaque for see through.
-                "fill-extrusion-opacity": 0.5,
+                "line-color": "red",
+                "line-width": 2
             }
         });
     });
