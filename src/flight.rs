@@ -1,7 +1,10 @@
 use std::fmt::Display;
 
 use chrono::NaiveDate;
+use geojson::Value::LineString;
+use geojson::{Feature, FeatureCollection, GeoJson, Geometry};
 use serde::Serialize;
+use serde_json::{Map, Number, Value};
 
 use crate::datetime::Duration;
 use crate::igc::{IgcFile, IgcFix};
@@ -9,7 +12,7 @@ use crate::igc::{IgcFile, IgcFix};
 #[derive(Serialize)]
 pub struct Flight {
     pub date: NaiveDate,
-    pub track: Vec<IgcFix>,
+    pub geojson: GeoJson,
     pub duration: Duration,
     pub track_duration: Duration,
 }
@@ -18,14 +21,48 @@ impl Flight {
     pub fn new(track: IgcFile) -> Self {
         Flight {
             date: track.get_date().expect("Missing date header"),
-            track: track.fixes.clone(),
+            geojson: Flight::geojson(&track),
             duration: Flight::duration(&track),
             track_duration: track.duration(),
         }
     }
 
+    // Split tracklog into LineString segments, because MapLibre does not support 3D
+    // GeoJSON out of the box.
+    // See https://github.com/maplibre/maplibre-gl-js/issues/644
+    pub fn geojson(track: &IgcFile) -> GeoJson {
+        GeoJson::FeatureCollection(FeatureCollection {
+            bbox: None,
+            features: track
+                .fixes
+                .windows(2)
+                .map(|pair| match pair {
+                    [a, b] => Feature {
+                        properties: {
+                            let mut map = Map::new();
+                            map.insert(
+                                "z".to_owned(),
+                                Value::Number(
+                                    Number::from_f64((b.alt + a.alt) as f64 / 2.0).unwrap(),
+                                ),
+                            );
+                            Some(map)
+                        },
+                        geometry: Some(Geometry::new(LineString(vec![
+                            vec![a.lon, a.lat],
+                            vec![b.lon, b.lat],
+                        ]))),
+                        ..Default::default()
+                    },
+                    _ => panic!("should never happen"),
+                })
+                .collect(),
+            foreign_members: None,
+        })
+    }
+
     pub fn duration(track: &IgcFile) -> Duration {
-        const MIN_FLYING_SPEED: f32 = 2.0;
+        const MIN_FLYING_SPEED: f64 = 2.0;
         Duration::from_seconds(
             track
                 .fixes
@@ -40,15 +77,15 @@ impl Flight {
         )
     }
 
-    pub fn speed_on_trajectory(start: &IgcFix, end: &IgcFix) -> f32 {
-        let time = (end.ts - start.ts).num_seconds() as f32;
+    pub fn speed_on_trajectory(start: &IgcFix, end: &IgcFix) -> f64 {
+        let time = (end.ts - start.ts).num_seconds() as f64;
         let distance_h = Flight::haversine_distance(start, end);
-        let distance_v = (end.alt - start.alt).abs() as f32;
+        let distance_v = (end.alt - start.alt).abs() as f64;
         (distance_v * distance_v + distance_h * distance_h) / time
     }
 
-    pub fn haversine_distance(start: &IgcFix, end: &IgcFix) -> f32 {
-        const EARTH_RADIUS_METER: f32 = 6_371_000.0;
+    pub fn haversine_distance(start: &IgcFix, end: &IgcFix) -> f64 {
+        const EARTH_RADIUS_METER: f64 = 6_371_000.0;
         let φ1 = start.lat.to_radians();
         let φ2 = end.lat.to_radians();
         let δφ = (end.lat - start.lat).to_radians();
