@@ -4,11 +4,129 @@
 <head>
     <meta charset="UTF-8" />
     <title>flight</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.css" />
+    <script src="https://unpkg.com/maplibre-gl@4.1.2/dist/maplibre-gl.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #map {
+            flex-grow: 1;
+        }
+    </style>
 </head>
 
 <body>
     <h1>{{ flight.date }}</h1>
     <p>{{ flight.duration }}</p>
+    <div id="map"></div>
 </body>
+
+<script defer>
+    // This key is domain-restricted, don't even try.
+    const API_KEY = "J9HxCuZ903G6MABPdFn6";
+    const map = (window.map = new maplibregl.Map({
+        container: "map",
+        zoom: 12,
+        center: [{{ flight.track[0].lon }}, {{ flight.track[0].lat }}],
+        pitch: 52,
+        hash: true,
+        style: {
+            version: 8,
+            sources: {
+                osm: {
+                    type: "raster",
+                    tiles: ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                    tileSize: 256,
+                    attribution: "&copy; OpenStreetMap Contributors",
+                    maxzoom: 19
+                },
+                // Use a different source for terrain and hillshade layers, to improve render quality
+                terrainSource: {
+                    type: "raster-dem",
+                    url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${API_KEY}`,
+                    tileSize: 256
+                },
+                hillshadeSource: {
+                    type: "raster-dem",
+                    url: `https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=${API_KEY}`,
+                    tileSize: 256
+                }
+            },
+            layers: [
+                {
+                    id: "osm",
+                    type: "raster",
+                    source: "osm"
+                },
+                {
+                    id: "hills",
+                    type: "hillshade",
+                    source: "hillshadeSource",
+                    layout: { visibility: "visible" },
+                    paint: { "hillshade-shadow-color": "#473B24" }
+                }
+            ],
+            terrain: {
+                source: "terrainSource",
+                exaggeration: 1
+            }
+        },
+        maxZoom: 18,
+        maxPitch: 85
+    }));
+
+    map.addControl(new maplibregl.FullscreenControl());
+
+    map.addControl(
+        new maplibregl.NavigationControl({
+            visualizePitch: true,
+            showZoom: true,
+            showCompass: true
+        })
+    );
+
+    map.addControl(
+        new maplibregl.TerrainControl({
+            source: "terrainSource",
+            exaggeration: 1
+        })
+    );
+
+    map.on("load", () => {
+        map.addSource("tracklog", {
+            "type": "geojson",
+            "data": {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [
+                        {%- for fix in flight.track -%}
+                            [{{ fix.lon }},{{ fix.lat }}],
+                        {%- endfor -%}]
+                }
+            }
+        });
+        map.addLayer({
+            "id": "tracklog",
+            "type": "line",
+            "source": "tracklog",
+            "layout": {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            "paint": {
+                "line-color": "#888",
+                "line-width": 8
+            }
+        });
+    });
+</script>
 
 </html>
