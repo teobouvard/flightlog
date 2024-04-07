@@ -26,9 +26,6 @@ impl Flight {
         }
     }
 
-    // Split tracklog into LineString segments, because MapLibre does not support 3D
-    // GeoJSON out of the box.
-    // See https://github.com/maplibre/maplibre-gl-js/issues/644
     pub fn geojson(track: &IgcFile) -> GeoJson {
         LineString(
             track
