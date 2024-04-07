@@ -33,7 +33,7 @@
     const map = (window.map = new maplibregl.Map({
         container: "map",
         zoom: 12,
-        center: {{ flight.geojson["features"][0]["geometry"]["coordinates"] }},
+        center: {{ flight.geojson["features"][0]["geometry"]["coordinates"][0] }},
         pitch: 52,
         hash: true,
         style: {
