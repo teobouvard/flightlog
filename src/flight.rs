@@ -1,10 +1,9 @@
 use std::fmt::Display;
 
 use chrono::NaiveDate;
+use geojson::GeoJson;
 use geojson::Value::LineString;
-use geojson::{Feature, FeatureCollection, GeoJson, Geometry};
 use serde::Serialize;
-use serde_json::{Map, Number, Value};
 
 use crate::datetime::Duration;
 use crate::igc::{IgcFile, IgcFix};
@@ -31,34 +30,14 @@ impl Flight {
     // GeoJSON out of the box.
     // See https://github.com/maplibre/maplibre-gl-js/issues/644
     pub fn geojson(track: &IgcFile) -> GeoJson {
-        GeoJson::FeatureCollection(FeatureCollection {
-            bbox: None,
-            features: track
+        LineString(
+            track
                 .fixes
-                .windows(2)
-                .map(|pair| match pair {
-                    [a, b] => Feature {
-                        properties: {
-                            let mut map = Map::new();
-                            map.insert(
-                                "z".to_owned(),
-                                Value::Number(
-                                    Number::from_f64((b.alt + a.alt) as f64 / 2.0).unwrap(),
-                                ),
-                            );
-                            Some(map)
-                        },
-                        geometry: Some(Geometry::new(LineString(vec![
-                            vec![a.lon, a.lat],
-                            vec![b.lon, b.lat],
-                        ]))),
-                        ..Default::default()
-                    },
-                    _ => panic!("should never happen"),
-                })
+                .iter()
+                .map(|fix| vec![fix.lon, fix.lat, fix.alt as f64])
                 .collect(),
-            foreign_members: None,
-        })
+        )
+        .into()
     }
 
     pub fn duration(track: &IgcFile) -> Duration {
