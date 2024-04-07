@@ -113,7 +113,7 @@
         interleaved: true,
         layers: [
             new PathLayer({
-                id: "PathLayer",
+                id: "tracklog",
                 data: [{{ flight.geojson | json_encode() }}],
                 getColor: [255, 0, 0],
                 getPath: d => d["coordinates"],
