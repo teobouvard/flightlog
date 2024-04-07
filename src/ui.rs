@@ -3,7 +3,7 @@ use std::io::Write;
 use std::path::Path;
 use std::{fs::File, io::BufWriter, path::PathBuf};
 
-use chrono::NaiveDate;
+use chrono::{DateTime, Utc};
 use minify_html::{minify, Cfg};
 use once_cell::sync::Lazy;
 use serde::Serialize;
@@ -26,13 +26,13 @@ pub static MINIFY_CFG: Lazy<Cfg> = Lazy::new(|| {
 
 #[derive(Serialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct IndexEntry {
-    date: NaiveDate,
+    takeoff: DateTime<Utc>,
     link: PathBuf,
 }
 
 impl IndexEntry {
-    pub fn new(date: NaiveDate, link: PathBuf) -> Self {
-        Self { date, link }
+    pub fn new(takeoff: DateTime<Utc>, link: PathBuf) -> Self {
+        Self { takeoff, link }
     }
 }
 
@@ -65,8 +65,8 @@ impl IndexPage {
 
 #[derive(Serialize)]
 pub struct FlightPage {
-    date_index: i8,
-    flight: Flight,
+    pub date_index: i8,
+    pub flight: Flight,
 }
 
 impl FlightPage {
