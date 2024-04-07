@@ -108,6 +108,7 @@
         })
     );
 
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const {MapboxOverlay, PathLayer} = deck;
     const deckOverlay = new MapboxOverlay({
         interleaved: true,
@@ -121,10 +122,16 @@
                 jointRounded: true,
                 widthMinPixels: 1,
                 widthMaxPixels: 5,
-                billboard: true,
+                // Billboard path does not seem to work on mobile devices, so we only
+                // enable it in windows having precise pointers.
+                billboard: !window.matchMedia("(pointer: coarse)").matches,
             })
         ]
       });
+
+      console.log("mobile:", isMobile);
+      console.log("touch:", );
+      console.log("pixel ratio:", window.devicePixelRatio);
 
       map.addControl(deckOverlay);
   </script>
