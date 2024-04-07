@@ -108,7 +108,6 @@
         })
     );
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const {MapboxOverlay, PathLayer} = deck;
     const deckOverlay = new MapboxOverlay({
         interleaved: true,
@@ -128,10 +127,6 @@
             })
         ]
       });
-
-      console.log("mobile:", isMobile);
-      console.log("touch:", );
-      console.log("pixel ratio:", window.devicePixelRatio);
 
       map.addControl(deckOverlay);
   </script>
