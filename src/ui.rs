@@ -4,6 +4,7 @@ use std::path::Path;
 use std::{fs::File, io::BufWriter, path::PathBuf};
 
 use chrono::NaiveDate;
+use minify_html::{minify, Cfg};
 use once_cell::sync::Lazy;
 use serde::Serialize;
 use tera::{Context, Tera};
@@ -14,6 +15,13 @@ pub static TEMPLATES: Lazy<Tera> = Lazy::new(|| {
     let mut tera = Tera::new("src/templates/**/*.html").expect("Could not initialize templates");
     tera.autoescape_on(vec![]);
     tera
+});
+
+pub static MINIFY_CFG: Lazy<Cfg> = Lazy::new(|| {
+    let mut cfg = Cfg::new();
+    cfg.minify_css = true;
+    cfg.minify_js = true;
+    cfg
 });
 
 #[derive(Serialize, PartialEq, Eq, PartialOrd, Ord)]
@@ -45,11 +53,12 @@ impl IndexPage {
         let result = TEMPLATES
             .render("index.html", &context)
             .expect("Could not render index template");
+        let compressed = minify(result.as_bytes(), &MINIFY_CFG);
         let output_file = output.join("index.html");
         let handle = File::create(output_file).expect("Could not create output file");
         let mut writer = BufWriter::new(handle);
         writer
-            .write_all(result.as_bytes())
+            .write_all(&compressed)
             .expect("Coult not write rendered template");
     }
 }
@@ -80,14 +89,14 @@ impl FlightPage {
         let result = TEMPLATES
             .render("flight.html", &context)
             .expect("Could not render flight template");
-
+        let compressed = minify(result.as_bytes(), &MINIFY_CFG);
         let output_file = output.join(self.get_link());
         fs::create_dir_all(output_file.parent().expect("Invalid directory"))
             .expect("Could not create directory");
         let handle = File::create(&output_file).expect("Could not create output file");
         let mut writer = BufWriter::new(handle);
         writer
-            .write_all(result.as_bytes())
+            .write_all(&compressed)
             .expect("Coult not write flight page");
     }
 }
