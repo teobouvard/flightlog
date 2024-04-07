@@ -19,8 +19,8 @@ pub enum IgcHeaderEntry {
 #[derive(Debug, Serialize, Clone)]
 pub struct IgcFix {
     pub ts: NaiveTime,
-    pub lat: f32,
-    pub lon: f32,
+    pub lat: f64,
+    pub lon: f64,
     pub alt: i32,
 }
 
@@ -74,9 +74,9 @@ impl IgcFile {
         }
     }
 
-    fn read_lat_degrees(record: &str) -> Result<f32, ParseFloatError> {
-        let degrees: f32 = record[0..2].parse()?;
-        let milliminutes: f32 = record[2..7].parse()?;
+    fn read_lat_degrees(record: &str) -> Result<f64, ParseFloatError> {
+        let degrees: f64 = record[0..2].parse()?;
+        let milliminutes: f64 = record[2..7].parse()?;
         let total_degrees = degrees + (milliminutes / 60_000.0);
         match record.chars().last() {
             Some('N') => Ok(total_degrees),
@@ -85,9 +85,9 @@ impl IgcFile {
         }
     }
 
-    fn read_lon_degrees(record: &str) -> Result<f32, ParseFloatError> {
-        let degrees: f32 = record[0..3].parse()?;
-        let milliminutes: f32 = record[3..8].parse()?;
+    fn read_lon_degrees(record: &str) -> Result<f64, ParseFloatError> {
+        let degrees: f64 = record[0..3].parse()?;
+        let milliminutes: f64 = record[3..8].parse()?;
         let total_degrees = degrees + (milliminutes / 60_000.0);
         match record.chars().last() {
             Some('E') => Ok(total_degrees),

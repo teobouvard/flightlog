@@ -33,7 +33,7 @@
     const map = (window.map = new maplibregl.Map({
         container: "map",
         zoom: 12,
-        center: [{{ flight.track[0].lon }}, {{ flight.track[0].lat }}],
+        center: {{ flight.geojson["features"][0]["geometry"]["coordinates"] }},
         pitch: 52,
         hash: true,
         style: {
@@ -101,17 +101,7 @@
     map.on("load", () => {
         map.addSource("tracklog", {
             "type": "geojson",
-            "data": {
-                "type": "Feature",
-                "properties": {},
-                "geometry": {
-                    "type": "LineString",
-                    "coordinates": [
-                        {%- for fix in flight.track -%}
-                            [{{ fix.lon }},{{ fix.lat }}],
-                        {%- endfor -%}]
-                }
-            }
+            "data": {{ flight.geojson | json_encode() }},
         });
         map.addLayer({
             "id": "tracklog",
@@ -124,6 +114,21 @@
             "paint": {
                 "line-color": "#888",
                 "line-width": 8
+            }
+        });
+        map.addLayer({
+            "id": "tracklog-extrusion",
+            "type": "fill-extrusion",
+            "source": "tracklog",
+            "paint": {
+                // See the MapLibre Style Specification for details on data expressions.
+                // https://maplibre.org/maplibre-style-spec/expressions/
+                "fill-extrusion-color": "red",
+                // Get fill-extrusion-base from the source "z" property.
+                "fill-extrusion-base": ["get", "z"],
+                "fill-extrusion-height": ["+", ["get", "z"], 10],
+                // Make extrusions slightly opaque for see through.
+                "fill-extrusion-opacity": 0.5,
             }
         });
     });
