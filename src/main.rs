@@ -52,6 +52,7 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
     .expect("Invalid search pattern")
     {
         let filename = entry.unwrap();
+        println!("Processing {}", filename.display());
         let file = File::open(&filename).expect("Could not open file");
 
         let flight = Flight::new(IgcFile::new(file));
