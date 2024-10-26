@@ -1,0 +1,13 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Data files
+data
+
+# Dependencies
+node_modules
+
+# Build artifacts
+dist
