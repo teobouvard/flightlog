@@ -9,9 +9,9 @@ use std::path::PathBuf;
 use chrono::NaiveDate;
 use clap::{Parser, Subcommand};
 use glob::{glob_with, MatchOptions};
-use ui::{FlightPage, IndexEntry};
+use ui::FlightlogEntry;
 
-use crate::{flight::Flight, igc::IgcFile, ui::IndexPage};
+use crate::{flight::Flight, igc::IgcFile};
 
 #[derive(Parser)]
 #[command(version, arg_required_else_help = true)]
@@ -35,7 +35,6 @@ enum Commands {
 }
 
 fn cmd_compile(input: PathBuf, output: PathBuf) {
-    let mut index = IndexPage::default();
     let mut date_current = NaiveDate::default();
     let mut date_index = 0;
 
@@ -62,14 +61,9 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
             date_current = flight.date;
             date_index = 0;
         }
-        let page = FlightPage::new(date_index, flight);
-        page.render(&output);
-
-        let entry = IndexEntry::new(page.flight.takeoff, page.get_link());
-        index.entries.push(entry);
+        let entry = FlightlogEntry::new(date_index, flight);
+        entry.render(&output);
     }
-
-    index.render(&output);
 }
 
 fn main() {
