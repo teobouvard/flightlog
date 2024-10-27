@@ -30,10 +30,6 @@ impl IgcFix {
     pub fn distance(&self, other: &IgcFix) -> f64 {
         Point::new(self.lon, self.lat).haversine_distance(&Point::new(other.lon, other.lat))
     }
-
-    pub fn bearing(&self, other: &IgcFix) -> f64 {
-        Point::new(self.lon, self.lat).haversine_bearing(Point::new(other.lon, other.lat))
-    }
 }
 
 #[derive(Debug)]

@@ -1,4 +1,3 @@
-use std::f64::NAN;
 use std::fmt::Display;
 
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
@@ -85,20 +84,6 @@ impl Flight {
     }
 
     pub fn states(track: &IgcFile) -> Vec<TrackState> {
-        let mut bearings_diff: Vec<f64> = track
-            .fixes
-            .windows(2)
-            .map(|pair| match pair {
-                [a, b] => a.bearing(b),
-                _ => NAN,
-            })
-            .collect::<Vec<_>>()
-            .windows(2)
-            .map(|w| (w[1] - w[0]).abs() % 180.0)
-            .collect();
-        bearings_diff.insert(0, 0.0);
-        bearings_diff.push(0.0);
-
         let mut altitudes_diff: Vec<i32> = track
             .fixes
             .windows(2)
@@ -114,10 +99,7 @@ impl Flight {
             .fixes
             .windows(2)
             .map(|pair| match pair {
-                [a, b] => {
-                    (a.distance(b).powi(2) + (b.alt - a.alt).pow(2) as f64)
-                        / (b.ts - a.ts).num_seconds() as f64
-                }
+                [a, b] => Flight::speed_on_trajectory(a, b),
                 _ => 0.0,
             })
             .collect::<Vec<_>>();
@@ -129,9 +111,6 @@ impl Flight {
             .collect();
 
         for (i, _) in track.fixes.iter().enumerate() {
-            if bearings_diff[i] < 10.0 {
-                states[i] = TrackState::Gliding;
-            }
             if altitudes_diff[i] > 0 {
                 states[i] = TrackState::Climbing;
             }
