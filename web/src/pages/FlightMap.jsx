@@ -6,13 +6,9 @@ import { useEffect, useRef } from "react";
 
 import "./FlightMap.css";
 import { mapStyle, skyStyle } from "./MapStyle";
+import { plasma_r } from "./colormap";
 
-const colorMap = {
-  Unknown: [0, 0, 0],
-  Landed: [0, 0, 255],
-  Climbing: [0, 255, 0],
-  Gliding: [255, 0, 0],
-};
+const cmap = plasma_r;
 
 function FlightMap({
   flight,
@@ -87,20 +83,41 @@ function FlightMap({
       return 255 * (1 - Math.pow(1 - i / playerTrailLength, 4));
     };
 
+    const lerp = (x, y, a) => x * (1 - a) + y * a;
+    const clamp = (a, min = 0, max = 1) => Math.min(max, Math.max(min, a));
+    const invlerp = (x, y, a) => clamp((a - x) / (y - x));
+    const range = (x1, y1, x2, y2, a) => lerp(x2, y2, invlerp(x1, y1, a));
+
     const flightLayer = new PathLayer({
       id: "tracklog",
       data: [flight],
       getColor: (d) =>
         displayFullTrack
-          ? d.states.map((el) => {
-              return colorMap[el];
+          ? d.geojson.coordinates.map((el, idx) => {
+              if (idx == 0) {
+                return [0, 0, 0, 0];
+              }
+              const climbRate = d.geojson.coordinates[idx - 1][2] - el[2];
+              return cmap(range(-5, 5, 0, 1, climbRate));
             })
-          : d.states
+          : d.geojson.coordinates
               .slice(
                 Math.max(0, currentPlayerPosition - playerTrailLength),
                 currentPlayerPosition,
               )
-              .map((el, idx) => colorMap[el].concat(computeAlpha(idx))),
+              .map((el, idx) => {
+                const mappedIndex =
+                  idx + Math.max(0, currentPlayerPosition - playerTrailLength);
+                if (mappedIndex == 0) {
+                  return [0, 0, 0, 0];
+                }
+
+                const climbRate =
+                  d.geojson.coordinates[mappedIndex - 1][2] - el[2];
+                return cmap(range(-5, 5, 0, 1, climbRate)).concat(
+                  computeAlpha(idx),
+                );
+              }),
       getPath: (d) =>
         displayFullTrack
           ? d.geojson.coordinates
