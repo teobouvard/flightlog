@@ -12,6 +12,7 @@ function FlightMap({
   currentPlayerPosition,
   playerTrailLength,
   displayFullTrack,
+  centerMapOnPosition,
 }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -64,6 +65,15 @@ function FlightMap({
   }, [flight]);
 
   useEffect(() => {
+    if (!centerMapOnPosition || !map.current) return;
+
+    map.current.easeTo({
+      center: flight.geojson.coordinates[currentPlayerPosition],
+      easing: (t) => t,
+    });
+  }, [flight, currentPlayerPosition, centerMapOnPosition]);
+
+  useEffect(() => {
     if (!flight) return;
 
     const flightLayer = new PathLayer({
@@ -74,7 +84,7 @@ function FlightMap({
         displayFullTrack
           ? d["coordinates"]
           : d["coordinates"].slice(
-              currentPlayerPosition - playerTrailLength,
+              Math.max(0, currentPlayerPosition - playerTrailLength),
               currentPlayerPosition,
             ),
       capRounded: true,
@@ -103,6 +113,7 @@ FlightMap.propTypes = {
   currentPlayerPosition: PropTypes.number.isRequired,
   playerTrailLength: PropTypes.number.isRequired,
   displayFullTrack: PropTypes.bool.isRequired,
+  centerMapOnPosition: PropTypes.bool.isRequired,
 };
 
 export { FlightMap };
