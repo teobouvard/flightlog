@@ -76,23 +76,9 @@ impl Flight {
 
     pub fn speed_on_trajectory(start: &IgcFix, end: &IgcFix) -> f64 {
         let time = (end.ts - start.ts).num_seconds() as f64;
-        let distance_h = Flight::haversine_distance(start, end);
+        let distance_h = start.distance(end);
         let distance_v = (end.alt - start.alt).abs() as f64;
         (distance_v * distance_v + distance_h * distance_h) / time
-    }
-
-    pub fn haversine_distance(start: &IgcFix, end: &IgcFix) -> f64 {
-        const EARTH_RADIUS_METER: f64 = 6_371_000.0;
-        let φ1 = start.lat.to_radians();
-        let φ2 = end.lat.to_radians();
-        let δφ = (end.lat - start.lat).to_radians();
-        let δλ = (end.lon - start.lon).to_radians();
-
-        let a = (δφ / 2.0).sin() * (δφ / 2.0).sin()
-            + φ1.cos() * φ2.cos() * (δλ / 2.0).sin() * (δλ / 2.0).sin();
-        let c = 2.0 * (a.sqrt()).asin();
-
-        EARTH_RADIUS_METER * c
     }
 }
 
