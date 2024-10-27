@@ -11,7 +11,7 @@ function FlightDetailsPage() {
   const { filename } = useLocation().state;
   const [data, setData] = useState(null);
   const [currentPlayerPosition, setCurrentPlayerPosition] = useState(0);
-  const [animationSpeed, setAnimationSpeed] = useState(100);
+  const [animationSpeed, setAnimationSpeed] = useState(50);
   const [playerTrailLength, setPlayerTrailLength] = useState(100);
   const [displayFullTrack, setDisplayFullTrack] = useState(true);
   const [centerMapOnPosition, setCenterMapOnPosition] = useState(false);
@@ -89,8 +89,8 @@ function FlightDetailsPage() {
       <input
         id="slider"
         type="range"
-        defaultValue={0}
         min="0"
+        value={currentPlayerPosition}
         max={data.flight.geojson.coordinates.length}
         onChange={(e) => handleSliderChange(parseInt(e.target.value))}
       ></input>
