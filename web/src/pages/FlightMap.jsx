@@ -7,6 +7,13 @@ import { useEffect, useRef } from "react";
 import "./FlightMap.css";
 import { mapStyle, skyStyle } from "./MapStyle";
 
+const colorMap = {
+  Unknown: [0, 0, 0],
+  Landed: [0, 0, 255],
+  Climbing: [0, 255, 0],
+  Gliding: [255, 0, 0],
+};
+
 function FlightMap({
   flight,
   currentPlayerPosition,
@@ -82,17 +89,22 @@ function FlightMap({
 
     const flightLayer = new PathLayer({
       id: "tracklog",
-      data: [flight.geojson.coordinates],
+      data: [flight],
       getColor: (d) =>
         displayFullTrack
-          ? [255, 0, 0]
-          : d
-              .slice(playerTrailLength)
-              .map((_, idx) => [255, 0, 0, computeAlpha(idx)]),
+          ? d.states.map((el) => {
+              return colorMap[el];
+            })
+          : d.states
+              .slice(
+                Math.max(0, currentPlayerPosition - playerTrailLength),
+                currentPlayerPosition,
+              )
+              .map((el, idx) => colorMap[el].concat(computeAlpha(idx))),
       getPath: (d) =>
         displayFullTrack
-          ? d
-          : d.slice(
+          ? d.geojson.coordinates
+          : d.geojson.coordinates.slice(
               Math.max(0, currentPlayerPosition - playerTrailLength),
               currentPlayerPosition,
             ),
