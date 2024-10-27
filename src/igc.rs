@@ -1,3 +1,5 @@
+use geo::prelude::*;
+use geo::Point;
 use std::{
     fmt::{self, Display},
     fs::File,
@@ -22,6 +24,12 @@ pub struct IgcFix {
     pub lat: f64,
     pub lon: f64,
     pub alt: i32,
+}
+
+impl IgcFix {
+    pub fn distance(&self, other: &IgcFix) -> f64 {
+        Point::new(self.lon, self.lat).haversine_distance(&Point::new(other.lon, other.lat))
+    }
 }
 
 #[derive(Debug)]
