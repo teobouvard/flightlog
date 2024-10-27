@@ -1,5 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import "./FlightDetailsPage.css";
@@ -10,8 +10,10 @@ const dataFiles = import.meta.glob("../../data/**/*.json");
 function FlightDetailsPage() {
   const { filename } = useLocation().state;
   const [data, setData] = useState(null);
-  const [range, setRange] = useState([0, 0]);
+  const [currentPlayerPosition, setCurrentPlayerPosition] = useState(0);
+  const [playerTrailLength, setPlayerTrailLength] = useState(100);
   const [displayFullTrack, setDisplayFullTrack] = useState(true);
+  const interval = useRef();
 
   useEffect(() => {
     const loadFile = async () => {
@@ -28,15 +30,21 @@ function FlightDetailsPage() {
 
   const handleSliderChange = (value) => {
     setDisplayFullTrack(false);
-    setRange([value - 100, value]);
+    setCurrentPlayerPosition(value);
   };
 
-  useEffect(() => {
-    if (!data) return;
-    if (displayFullTrack) {
-      setRange([0, data.flight.geojson.length]);
-    }
-  }, [data, displayFullTrack]);
+  const handleDisplayFullTrackButtonClick = () => {
+    setDisplayFullTrack(true);
+    clearInterval(interval.current);
+    interval.current = null;
+  };
+
+  const startPlaying = () => {
+    setDisplayFullTrack(false);
+    interval.current = setInterval(() => {
+      setCurrentPlayerPosition((pos) => pos + 1);
+    }, 100);
+  };
 
   if (!data) return <p>Loading...</p>;
   if (data.error) return <p>{data.error}</p>;
@@ -45,24 +53,31 @@ function FlightDetailsPage() {
     <div>
       <h1>{data.flight.date}</h1>
       <p>{data.flight.duration}</p>
-      <div>
-        <button
-          type="button"
-          disabled={displayFullTrack}
-          onClick={() => setDisplayFullTrack(true)}
-        >
-          Display full track
-        </button>
-      </div>
+      <button
+        type="button"
+        disabled={displayFullTrack}
+        onClick={handleDisplayFullTrackButtonClick}
+      >
+        Display full track
+      </button>
+      <button type="button" disabled={interval.current} onClick={startPlaying}>
+        Play
+      </button>
       <input
         id="slider"
         type="range"
+        defaultValue={0}
         min="0"
         max={data.flight.geojson.coordinates.length}
         onChange={(e) => handleSliderChange(parseInt(e.target.value))}
       ></input>
 
-      <FlightMap flight={data.flight} range={range} />
+      <FlightMap
+        flight={data.flight}
+        currentPlayerPosition={currentPlayerPosition}
+        playerTrailLength={playerTrailLength}
+        displayFullTrack={displayFullTrack}
+      />
     </div>
   );
 }
