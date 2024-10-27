@@ -11,6 +11,7 @@ function FlightDetailsPage() {
   const { filename } = useLocation().state;
   const [data, setData] = useState(null);
   const [range, setRange] = useState([0, 0]);
+  const [displayFullTrack, setDisplayFullTrack] = useState(true);
 
   useEffect(() => {
     const loadFile = async () => {
@@ -26,8 +27,16 @@ function FlightDetailsPage() {
   }, [filename]);
 
   const handleSliderChange = (value) => {
+    setDisplayFullTrack(false);
     setRange([value - 100, value]);
   };
+
+  useEffect(() => {
+    if (!data) return;
+    if (displayFullTrack) {
+      setRange([0, data.flight.geojson.length]);
+    }
+  }, [data, displayFullTrack]);
 
   if (!data) return <p>Loading...</p>;
   if (data.error) return <p>{data.error}</p>;
@@ -36,6 +45,15 @@ function FlightDetailsPage() {
     <div>
       <h1>{data.flight.date}</h1>
       <p>{data.flight.duration}</p>
+      <div>
+        <button
+          type="button"
+          disabled={displayFullTrack}
+          onClick={() => setDisplayFullTrack(true)}
+        >
+          Display full track
+        </button>
+      </div>
       <input
         id="slider"
         type="range"
