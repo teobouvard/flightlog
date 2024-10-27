@@ -1,7 +1,6 @@
+import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-
-import "maplibre-gl/dist/maplibre-gl.css";
 import "./FlightDetailsPage.css";
 import { FlightMap } from "./FlightMap";
 
