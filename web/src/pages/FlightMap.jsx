@@ -3,7 +3,6 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import maplibregl from "maplibre-gl";
 import PropTypes from "prop-types";
 import { useEffect, useRef } from "react";
-
 import "./FlightMap.css";
 import { mapStyle, skyStyle } from "./MapStyle";
 
@@ -40,14 +39,14 @@ function FlightMap({ flight, range }) {
         visualizePitch: true,
         showZoom: true,
         showCompass: true,
-      })
+      }),
     );
 
     map.current.addControl(
       new maplibregl.TerrainControl({
         source: "terrainSource",
         exaggeration: 1,
-      })
+      }),
     );
 
     const deckOverlay = new MapboxOverlay({
