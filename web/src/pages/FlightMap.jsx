@@ -76,14 +76,23 @@ function FlightMap({
   useEffect(() => {
     if (!flight) return;
 
+    const computeAlpha = (i) => {
+      return 255 * (1 - Math.pow(1 - i / playerTrailLength, 4));
+    };
+
     const flightLayer = new PathLayer({
       id: "tracklog",
-      data: [flight.geojson],
-      getColor: [255, 0, 0],
+      data: [flight.geojson.coordinates],
+      getColor: (d) =>
+        displayFullTrack
+          ? [255, 0, 0]
+          : d
+              .slice(playerTrailLength)
+              .map((_, idx) => [255, 0, 0, computeAlpha(idx)]),
       getPath: (d) =>
         displayFullTrack
-          ? d["coordinates"]
-          : d["coordinates"].slice(
+          ? d
+          : d.slice(
               Math.max(0, currentPlayerPosition - playerTrailLength),
               currentPlayerPosition,
             ),
