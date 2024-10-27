@@ -45,6 +45,7 @@ function FlightDetailsPage() {
       hash: true,
       style: mapStyle,
       maxZoom: 18,
+      minZoom: 6,
       maxPitch: 80,
     });
 
