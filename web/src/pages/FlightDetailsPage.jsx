@@ -42,7 +42,7 @@ function FlightDetailsPage() {
       zoom: 12,
       center: data.flight.geojson.coordinates[0],
       pitch: 50,
-      hash: true,
+      hash: false,
       style: mapStyle,
       maxZoom: 18,
       minZoom: 6,
@@ -60,14 +60,14 @@ function FlightDetailsPage() {
         visualizePitch: true,
         showZoom: true,
         showCompass: true,
-      }),
+      })
     );
 
     map.current.addControl(
       new maplibregl.TerrainControl({
         source: "terrainSource",
         exaggeration: 1,
-      }),
+      })
     );
 
     const deckOverlay = new MapboxOverlay({
