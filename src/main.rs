@@ -1,13 +1,16 @@
 mod datetime;
 mod flight;
+mod flightlog;
 mod igc;
 mod ui;
+use log::info;
 
 use std::fs::File;
 use std::path::PathBuf;
 
 use chrono::NaiveDate;
 use clap::{Parser, Subcommand};
+use flightlog::FlightLog;
 use glob::{glob_with, MatchOptions};
 use ui::FlightlogEntry;
 
@@ -37,6 +40,7 @@ enum Commands {
 fn cmd_compile(input: PathBuf, output: PathBuf) {
     let mut date_current = NaiveDate::default();
     let mut date_index = 0;
+    let mut flights: Vec<FlightlogEntry> = vec![];
 
     for entry in glob_with(
         input
@@ -51,7 +55,7 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
     .expect("Invalid search pattern")
     {
         let filename = entry.unwrap();
-        println!("Processing {}", filename.display());
+        info!("Processing {}", filename.display());
         let file = File::open(&filename).expect("Could not open file");
 
         let flight = Flight::new(IgcFile::new(file));
@@ -63,7 +67,14 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
         }
         let entry = FlightlogEntry::new(date_index, flight);
         entry.render(&output);
+        flights.push(entry);
     }
+
+    let flightlog = FlightLog::new(flights);
+    info!(
+        "Total duration: {}",
+        flightlog.get_total_flight_duration().to_seconds()
+    );
 }
 
 fn main() {
