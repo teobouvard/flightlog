@@ -11,8 +11,10 @@ function FlightDetailsPage() {
   const { filename } = useLocation().state;
   const [data, setData] = useState(null);
   const [currentPlayerPosition, setCurrentPlayerPosition] = useState(0);
+  const [animationSpeed, setAnimationSpeed] = useState(100);
   const [playerTrailLength, setPlayerTrailLength] = useState(100);
   const [displayFullTrack, setDisplayFullTrack] = useState(true);
+  const [centerMapOnPosition, setCenterMapOnPosition] = useState(false);
   const interval = useRef();
 
   useEffect(() => {
@@ -43,7 +45,7 @@ function FlightDetailsPage() {
     setDisplayFullTrack(false);
     interval.current = setInterval(() => {
       setCurrentPlayerPosition((pos) => pos + 1);
-    }, 100);
+    }, animationSpeed);
   };
 
   if (!data) return <p>Loading...</p>;
@@ -63,6 +65,14 @@ function FlightDetailsPage() {
       <button type="button" disabled={interval.current} onClick={startPlaying}>
         Play
       </button>
+      <div>
+        <p>Center map on current position</p>
+        <input
+          type="checkbox"
+          checked={centerMapOnPosition}
+          onChange={() => setCenterMapOnPosition(!centerMapOnPosition)}
+        />
+      </div>
       <input
         id="slider"
         type="range"
@@ -77,6 +87,7 @@ function FlightDetailsPage() {
         currentPlayerPosition={currentPlayerPosition}
         playerTrailLength={playerTrailLength}
         displayFullTrack={displayFullTrack}
+        centerMapOnPosition={centerMapOnPosition}
       />
     </div>
   );
