@@ -1,24 +1,29 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const dataFiles = import.meta.glob("../../data/**/*.json");
+import data from "../../data/index.json";
 
 function IndexPage() {
-  const [files, setFiles] = useState([]);
+  const [entries, setEntries] = useState([]);
 
   useEffect(() => {
-    const loadFiles = async () => {
-      const fileEntries = await Promise.all(
-        Object.entries(dataFiles).map(async ([path, loadFile]) => {
-          const fileData = await loadFile();
-          const link = path.split("/").slice(-3).join("-").replace(".json", "");
-          return { link: link, filename: path, label: fileData.flight.takeoff };
-        }),
-      );
-      setFiles(fileEntries);
-    };
-
-    loadFiles();
+    setEntries(
+      data.entries.map(({ name, date }) => {
+        return {
+          link: name,
+          filename:
+            "../../data/" +
+            name
+              .split("-")
+              .slice(0, 3)
+              .join("/")
+              .concat("-")
+              .concat(name.split("-").slice(-1))
+              .concat(".json"),
+          label: date,
+        };
+      }),
+    );
   }, []);
 
   return (
@@ -31,7 +36,7 @@ function IndexPage() {
           </tr>
         </thead>
         <tbody>
-          {files.toReversed().map((entry) => (
+          {entries.toReversed().map((entry) => (
             <tr key={entry.link}>
               <td>
                 <Link

@@ -71,6 +71,7 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
     }
 
     let flightlog = FlightLog::new(flights);
+    flightlog.render(&output);
     info!(
         "Total duration: {}",
         flightlog.get_total_flight_duration().to_seconds()
