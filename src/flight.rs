@@ -3,6 +3,7 @@ use std::fmt::Display;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use geojson::GeoJson;
 use geojson::Value::LineString;
+use log::info;
 use serde::Serialize;
 
 use crate::datetime::Duration;
@@ -106,17 +107,36 @@ impl Flight {
         squared_speeds.insert(0, 0.0);
         squared_speeds.push(0.0);
 
+        let mut glide_ratios = track
+            .fixes
+            .windows(2)
+            .map(|pair| match pair {
+                [a, b] => a.distance(b) / (a.alt - b.alt) as f64,
+                _ => 0.0,
+            })
+            .collect::<Vec<_>>();
+        glide_ratios.insert(0, 0.0);
+        glide_ratios.push(0.0);
+
         let mut states: Vec<TrackState> = std::iter::repeat(TrackState::Gliding)
             .take(track.fixes.len())
             .collect();
 
+        let mut glide_ratios_during_glide = vec![];
         for (i, _) in track.fixes.iter().enumerate() {
             if altitudes_diff[i] > 0 {
                 states[i] = TrackState::Climbing;
-            }
-            if squared_speeds[i] < 1.0 {
+            } else if squared_speeds[i] < 1.0 {
                 states[i] = TrackState::Landed;
+            } else if glide_ratios[i] != f64::INFINITY {
+                glide_ratios_during_glide.push(glide_ratios[i]);
             }
+        }
+
+        if glide_ratios_during_glide.len() > 10 {
+            glide_ratios_during_glide.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            let mid = glide_ratios_during_glide.len() / 2;
+            info!("Median glide ratio: {}", glide_ratios_during_glide[mid]);
         }
 
         states
