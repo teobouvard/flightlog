@@ -1,3 +1,4 @@
+use std::f64::NAN;
 use std::fmt::Display;
 
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
@@ -8,6 +9,13 @@ use serde::Serialize;
 use crate::datetime::Duration;
 use crate::igc::{IgcFile, IgcFix};
 
+#[derive(Clone, Serialize)]
+pub enum TrackState {
+    Landed,
+    Gliding,
+    Climbing,
+}
+
 #[derive(Serialize)]
 pub struct Flight {
     pub date: NaiveDate,
@@ -15,6 +23,7 @@ pub struct Flight {
     pub geojson: GeoJson,
     pub duration: Duration,
     pub track_duration: Duration,
+    pub states: Vec<TrackState>,
 }
 
 impl Flight {
@@ -26,6 +35,7 @@ impl Flight {
             geojson: Flight::geojson(&track),
             duration: Flight::duration(&track),
             track_duration: track.duration(),
+            states: Flight::states(&track),
         }
     }
 
@@ -72,6 +82,66 @@ impl Flight {
                 })
                 .sum(),
         )
+    }
+
+    pub fn states(track: &IgcFile) -> Vec<TrackState> {
+        let mut bearings_diff: Vec<f64> = track
+            .fixes
+            .windows(2)
+            .map(|pair| match pair {
+                [a, b] => a.bearing(b),
+                _ => NAN,
+            })
+            .collect::<Vec<_>>()
+            .windows(2)
+            .map(|w| (w[1] - w[0]).abs() % 180.0)
+            .collect();
+        bearings_diff.insert(0, 0.0);
+        bearings_diff.push(0.0);
+
+        let mut altitudes_diff: Vec<i32> = track
+            .fixes
+            .windows(2)
+            .map(|pair| match pair {
+                [a, b] => b.alt - a.alt,
+                _ => 0,
+            })
+            .collect::<Vec<_>>();
+        altitudes_diff.insert(0, 0);
+        altitudes_diff.push(0);
+
+        let mut squared_speeds = track
+            .fixes
+            .windows(2)
+            .map(|pair| match pair {
+                [a, b] => {
+                    (a.distance(b).powi(2) + (b.alt - a.alt).pow(2) as f64)
+                        / (b.ts - a.ts).num_seconds() as f64
+                }
+                _ => 0.0,
+            })
+            .collect::<Vec<_>>();
+        squared_speeds.insert(0, 0.0);
+        squared_speeds.push(0.0);
+
+        let mut states: Vec<TrackState> = std::iter::repeat(TrackState::Gliding)
+            .take(track.fixes.len())
+            .collect();
+
+        for (i, _) in track.fixes.iter().enumerate() {
+            if bearings_diff[i] < 10.0 {
+                states[i] = TrackState::Gliding;
+            }
+            if altitudes_diff[i] > 0 {
+                states[i] = TrackState::Climbing;
+            }
+            println!("{}", squared_speeds[i]);
+            if squared_speeds[i] < 1.0 {
+                states[i] = TrackState::Landed;
+            }
+        }
+
+        states
     }
 
     pub fn speed_on_trajectory(start: &IgcFix, end: &IgcFix) -> f64 {
