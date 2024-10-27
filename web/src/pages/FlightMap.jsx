@@ -7,7 +7,12 @@ import { useEffect, useRef } from "react";
 import "./FlightMap.css";
 import { mapStyle, skyStyle } from "./MapStyle";
 
-function FlightMap({ flight, range }) {
+function FlightMap({
+  flight,
+  currentPlayerPosition,
+  playerTrailLength,
+  displayFullTrack,
+}) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const overlay = useRef(null);
@@ -61,12 +66,17 @@ function FlightMap({ flight, range }) {
   useEffect(() => {
     if (!flight) return;
 
-    const [start, end] = range;
     const flightLayer = new PathLayer({
       id: "tracklog",
       data: [flight.geojson],
       getColor: [255, 0, 0],
-      getPath: (d) => d["coordinates"].slice(start, end),
+      getPath: (d) =>
+        displayFullTrack
+          ? d["coordinates"]
+          : d["coordinates"].slice(
+              currentPlayerPosition - playerTrailLength,
+              currentPlayerPosition,
+            ),
       capRounded: true,
       jointRounded: true,
       widthMinPixels: 1,
@@ -79,7 +89,7 @@ function FlightMap({ flight, range }) {
     overlay.current.setProps({
       layers: [flightLayer],
     });
-  }, [flight, range]);
+  }, [flight, currentPlayerPosition, playerTrailLength, displayFullTrack]);
 
   return (
     <div className="map-wrap">
@@ -90,7 +100,9 @@ function FlightMap({ flight, range }) {
 
 FlightMap.propTypes = {
   flight: PropTypes.object.isRequired,
-  range: PropTypes.array.isRequired,
+  currentPlayerPosition: PropTypes.number.isRequired,
+  playerTrailLength: PropTypes.number.isRequired,
+  displayFullTrack: PropTypes.bool.isRequired,
 };
 
 export { FlightMap };
