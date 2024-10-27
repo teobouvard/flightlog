@@ -135,7 +135,6 @@ impl Flight {
             if altitudes_diff[i] > 0 {
                 states[i] = TrackState::Climbing;
             }
-            println!("{}", squared_speeds[i]);
             if squared_speeds[i] < 1.0 {
                 states[i] = TrackState::Landed;
             }
