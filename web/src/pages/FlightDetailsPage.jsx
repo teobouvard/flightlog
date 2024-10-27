@@ -1,5 +1,5 @@
 import "maplibre-gl/dist/maplibre-gl.css";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import "./FlightDetailsPage.css";
@@ -15,7 +15,7 @@ function FlightDetailsPage() {
   const [playerTrailLength, setPlayerTrailLength] = useState(100);
   const [displayFullTrack, setDisplayFullTrack] = useState(true);
   const [centerMapOnPosition, setCenterMapOnPosition] = useState(false);
-  const interval = useRef();
+  const [ticker, setTicker] = useState();
 
   useEffect(() => {
     const loadFile = async () => {
@@ -36,16 +36,29 @@ function FlightDetailsPage() {
   };
 
   const handleDisplayFullTrackButtonClick = () => {
+    stopPlayback();
     setDisplayFullTrack(true);
-    clearInterval(interval.current);
-    interval.current = null;
   };
 
-  const startPlaying = () => {
+  const stopPlayback = () => {
+    clearInterval(ticker);
+    setTicker(null);
+  };
+
+  const startPlayback = () => {
     setDisplayFullTrack(false);
-    interval.current = setInterval(() => {
+    const ticker = setInterval(() => {
       setCurrentPlayerPosition((pos) => pos + 1);
     }, animationSpeed);
+    setTicker(ticker);
+  };
+
+  const handlePlayButtonClick = () => {
+    if (ticker) {
+      stopPlayback();
+    } else {
+      startPlayback();
+    }
   };
 
   if (!data) return <p>Loading...</p>;
@@ -62,8 +75,8 @@ function FlightDetailsPage() {
       >
         Display full track
       </button>
-      <button type="button" disabled={interval.current} onClick={startPlaying}>
-        Play
+      <button type="button" onClick={() => handlePlayButtonClick()}>
+        {ticker ? "Pause" : "Play"}
       </button>
       <div>
         <p>Center map on current position</p>
