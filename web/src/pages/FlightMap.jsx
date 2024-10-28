@@ -129,6 +129,7 @@ function FlightMap({
       jointRounded: true,
       widthMinPixels: 1,
       widthMaxPixels: 5,
+      widthScale: 2,
       // Billboard path does not seem to work on mobile devices, so we only
       // enable it in windows having precise pointers.
       billboard: !window.matchMedia("(pointer: coarse)").matches,
