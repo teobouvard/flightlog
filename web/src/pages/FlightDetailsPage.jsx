@@ -1,14 +1,25 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import "./FlightDetailsPage.css";
 import { FlightMap } from "./FlightMap";
 
 const dataFiles = import.meta.glob("../../data/**/*.json");
 
+const mapIdToFilename = (id) =>
+  "../../data/" +
+  id
+    .split("-")
+    .slice(0, 3)
+    .join("/")
+    .concat("-")
+    .concat(id.split("-").slice(-1))
+    .concat(".json");
+
 function FlightDetailsPage() {
-  const { filename } = useLocation().state;
+  const { id } = useParams();
+  const filename = mapIdToFilename(id);
   const [data, setData] = useState(null);
   const [currentPlayerPosition, setCurrentPlayerPosition] = useState(0);
   const [animationSpeed, setAnimationSpeed] = useState(50);
