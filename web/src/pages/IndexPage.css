@@ -1,0 +1,12 @@
+.main-title {
+  margin: 0.5em;
+  font-family: monospace;
+  font-size: 24px;
+  white-space: nowrap;
+}
+
+.main-content {
+  margin: auto;
+  width: 80%;
+  display: flex;
+}

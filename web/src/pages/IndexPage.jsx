@@ -1,16 +1,37 @@
+import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import data from "../../data/index.json";
+import "./IndexPage.css";
+
+const columns = [
+  {
+    field: "date",
+    headerName: "date",
+    flex: 1,
+  },
+  { field: "duration", headerName: "duration", flex: 1 },
+  {
+    field: "none",
+    headerName: "track",
+    renderCell: ({ row }) => (
+      <Link to={`/flight/${row.id}`} state={{ filename: row.filename }}>
+        view
+      </Link>
+    ),
+    flex: 0.5,
+  },
+];
 
 function IndexPage() {
   const [entries, setEntries] = useState([]);
 
   useEffect(() => {
     setEntries(
-      data.entries.map(({ name, date }) => {
+      data.entries.map(({ name, duration_s, ...params }) => {
         return {
-          link: name,
+          id: name,
           filename:
             "../../data/" +
             name
@@ -20,7 +41,8 @@ function IndexPage() {
               .concat("-")
               .concat(name.split("-").slice(-1))
               .concat(".json"),
-          label: date,
+          duration: new Date(duration_s * 1000).toISOString().slice(11, 19),
+          ...params,
         };
       }),
     );
@@ -28,28 +50,21 @@ function IndexPage() {
 
   return (
     <div>
-      <h1>flightlog</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {entries.toReversed().map((entry) => (
-            <tr key={entry.link}>
-              <td>
-                <Link
-                  to={`/flight/${entry.link}`}
-                  state={{ filename: entry.filename }}
-                >
-                  {entry.label}
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h1 className="main-title">flightlog</h1>
+      <div className="main-content">
+        <DataGrid
+          columns={columns}
+          rows={entries}
+          disableColumnResize={true}
+          disableColumnMenu={true}
+          disableRowSelectionOnClick={true}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: "date", sort: "desc" }],
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }
