@@ -29,6 +29,10 @@ function FlightDetailsPage() {
   const [ticker, setTicker] = useState();
 
   useEffect(() => {
+    document.title = `flight ${id}`;
+  }, [id]);
+
+  useEffect(() => {
     const loadFile = async () => {
       if (dataFiles[filename]) {
         const fileContents = await dataFiles[filename]();
