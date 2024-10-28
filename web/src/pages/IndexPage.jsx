@@ -15,11 +15,7 @@ const columns = [
   {
     field: "none",
     headerName: "track",
-    renderCell: ({ row }) => (
-      <Link to={`/flight/${row.id}`} state={{ filename: row.filename }}>
-        view
-      </Link>
-    ),
+    renderCell: ({ row }) => <Link to={`/flight/${row.id}`}>view</Link>,
     flex: 0.5,
   },
 ];
@@ -32,15 +28,6 @@ function IndexPage() {
       data.entries.map(({ name, duration_s, ...params }) => {
         return {
           id: name,
-          filename:
-            "../../data/" +
-            name
-              .split("-")
-              .slice(0, 3)
-              .join("/")
-              .concat("-")
-              .concat(name.split("-").slice(-1))
-              .concat(".json"),
           duration: new Date(duration_s * 1000).toISOString().slice(11, 19),
           ...params,
         };
