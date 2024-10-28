@@ -11,6 +11,10 @@
     "fmt": "prettier . --write"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.1.5",
+    "@mui/x-data-grid": "^7.22.0",
     "deck.gl": "^9.0.34",
     "maplibre-gl": "^4.7.1",
     "react": "^18.3.1",
