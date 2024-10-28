@@ -13,6 +13,7 @@ use crate::ui::FlightlogEntry;
 pub struct FlightLogIndexEntry {
     pub date: DateTime<Utc>,
     pub name: String,
+    pub duration_s: i64,
 }
 
 #[derive(Serialize)]
@@ -46,6 +47,7 @@ impl FlightLog {
                         entry.flight.date.format("%Y-%m-%d"),
                         entry.date_index
                     ),
+                    duration_s: entry.flight.duration.to_seconds(),
                 })
                 .collect::<Vec<_>>(),
         };
