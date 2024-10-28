@@ -43,7 +43,7 @@ function IndexPage() {
           columns={columns}
           rows={entries}
           disableColumnResize={true}
-          disableColumnMenu={true}
+          disableColumnMenu={false}
           disableRowSelectionOnClick={true}
           initialState={{
             sorting: {
