@@ -71,13 +71,28 @@ impl IgcFile {
     }
 
     fn read_igc_record_h(record: String) -> IgcHeaderEntry {
-        let header_subtype = &record[2..5];
-        match header_subtype {
-            "DTE" => IgcHeaderEntry::Date {
-                date: NaiveDate::parse_from_str(&record[5..], "%d%m%y").unwrap_or_else(|err| {
-                    panic!("Could not parse date from header {}: {}", record, err)
-                }),
+        let header_parts = record.split_once(':');
+        match header_parts {
+            Some(("HFDTEDATE", date)) => IgcHeaderEntry::Date {
+                date: NaiveDate::parse_and_remainder(date, "%d%m%y")
+                    .unwrap_or_else(|err| {
+                        panic!("Could not parse date from header {}: {}", record, err)
+                    })
+                    .0,
             },
+            None => {
+                if let Some(date) = record.strip_prefix("HFDTE") {
+                    return IgcHeaderEntry::Date {
+                        date: NaiveDate::parse_and_remainder(date, "%d%m%y")
+                            .unwrap_or_else(|err| {
+                                panic!("Could not parse date from header {}: {}", record, err)
+                            })
+                            .0,
+                    };
+                } else {
+                    IgcHeaderEntry::Unsupported { record }
+                }
+            }
             _ => IgcHeaderEntry::Unsupported { record },
         }
     }
