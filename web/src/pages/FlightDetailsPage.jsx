@@ -80,7 +80,7 @@ function FlightDetailsPage() {
   if (data.error) return <p>{data.error}</p>;
 
   return (
-    <div>
+    <div className="wrapper">
       <h1>{data.flight.date}</h1>
       <p>{data.flight.duration}</p>
       <button
@@ -102,7 +102,6 @@ function FlightDetailsPage() {
         />
       </div>
       <input
-        id="slider"
         type="range"
         min="0"
         value={currentPlayerPosition}

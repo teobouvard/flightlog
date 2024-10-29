@@ -40,6 +40,7 @@ function FlightMap({
 
     map.current.on("load", () => {
       map.current.setSky(skyStyle);
+      map.current.resize();
     });
 
     map.current.addControl(new maplibregl.FullscreenControl());
