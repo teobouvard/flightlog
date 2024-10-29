@@ -106,7 +106,7 @@ function FlightDetailsPage() {
         min="0"
         value={currentPlayerPosition}
         max={data.flight.geojson.coordinates.length}
-        onChange={(e) => handleSliderChange(parseInt(e.target.value))}
+        onChange={(e) => handleSliderChange(Number.parseInt(e.target.value))}
       ></input>
 
       <FlightMap

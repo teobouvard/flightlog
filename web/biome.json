@@ -1,0 +1,14 @@
+{
+  "organizeImports": {
+    "enabled": true
+  },
+  "formatter": {
+    "indentStyle": "space"
+  },
+  "linter": {
+    "enabled": false
+  },
+  "files": {
+    "ignore": ["data", "dist"]
+  }
+}

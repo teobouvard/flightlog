@@ -9,7 +9,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "fmt": "prettier . --write"
+    "fmt": "biome check . --write"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -23,8 +23,8 @@
     "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@eslint/js": "^9.13.0",
-    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
@@ -33,17 +33,6 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.13",
     "globals": "^15.11.0",
-    "prettier": "^3.3.3",
     "vite": "^5.4.9"
-  },
-  "prettier": {
-    "importOrder": [
-      "<THIRD_PARTY_MODULES>",
-      "^[./]"
-    ],
-    "importOrderSeparation": true,
-    "plugins": [
-      "@trivago/prettier-plugin-sort-imports"
-    ]
   }
 }
