@@ -15,7 +15,7 @@ use crate::datetime::Duration;
 #[derive(Debug)]
 pub enum IgcHeaderEntry {
     Date { date: NaiveDate },
-    Unsupported { record: String },
+    Unsupported,
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -90,10 +90,10 @@ impl IgcFile {
                             .0,
                     };
                 } else {
-                    IgcHeaderEntry::Unsupported { record }
+                    IgcHeaderEntry::Unsupported
                 }
             }
-            _ => IgcHeaderEntry::Unsupported { record },
+            _ => IgcHeaderEntry::Unsupported,
         }
     }
 
