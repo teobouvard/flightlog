@@ -47,7 +47,7 @@ jobs:
           rustup default stable
           cargo run --release -- compile logs --output web/data
           cd web
-          npm install
+          npm ci
           npm run build
       - name: Upload artifacts
         uses: actions/upload-pages-artifact@v3
