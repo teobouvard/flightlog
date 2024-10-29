@@ -1,11 +1,8 @@
 .map-wrap {
-  position: relative;
-  width: 100%;
-  height: 90vh;
+  flex-grow: 1;
 }
 
 .map {
-  position: absolute;
   width: 100%;
   height: 100%;
 }
