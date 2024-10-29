@@ -18,6 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  # See https://github.com/vitejs/vite/issues/2433
   NODE_OPTIONS: --max-old-space-size=16384
 
 jobs:
