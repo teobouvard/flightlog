@@ -1,24 +1,8 @@
-import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 import data from "../../data/index.json";
+import FlightList from "./FlightList";
 import "./IndexPage.css";
-
-const columns = [
-  {
-    field: "date",
-    headerName: "date",
-    flex: 1,
-  },
-  { field: "duration", headerName: "duration", flex: 1 },
-  {
-    field: "none",
-    headerName: "track",
-    renderCell: ({ row }) => <Link to={`/flight/${row.id}`}>view</Link>,
-    flex: 0.5,
-  },
-];
 
 function IndexPage() {
   const [entries, setEntries] = useState([]);
@@ -39,18 +23,7 @@ function IndexPage() {
     <div>
       <h1 className="main-title">flightlog</h1>
       <div className="main-content">
-        <DataGrid
-          columns={columns}
-          rows={entries}
-          disableColumnResize={true}
-          disableColumnMenu={false}
-          disableRowSelectionOnClick={true}
-          initialState={{
-            sorting: {
-              sortModel: [{ field: "date", sort: "desc" }],
-            },
-          }}
-        />
+        <FlightList entries={entries} />
       </div>
     </div>
   );
