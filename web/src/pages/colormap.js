@@ -19442,8 +19442,8 @@ function evaluate_cmap(x, name, reverse) {
   }
 
   // Get the colors and whether or not we need to interpolate
-  let colors = data[name]["colors"];
-  let interpolate = data[name]["interpolate"];
+  const colors = data[name]["colors"];
+  const interpolate = data[name]["interpolate"];
 
   if (interpolate === true) {
     return interpolated(x, colors);
@@ -19453,11 +19453,11 @@ function evaluate_cmap(x, name, reverse) {
 }
 
 function interpolated(x, colors) {
-  let lo = Math.floor(x * (colors.length - 1));
-  let hi = Math.ceil(x * (colors.length - 1));
-  let r = Math.round(((colors[lo][0] + colors[hi][0]) / 2) * 255);
-  let g = Math.round(((colors[lo][1] + colors[hi][1]) / 2) * 255);
-  let b = Math.round(((colors[lo][2] + colors[hi][2]) / 2) * 255);
+  const lo = Math.floor(x * (colors.length - 1));
+  const hi = Math.ceil(x * (colors.length - 1));
+  const r = Math.round(((colors[lo][0] + colors[hi][0]) / 2) * 255);
+  const g = Math.round(((colors[lo][1] + colors[hi][1]) / 2) * 255);
+  const b = Math.round(((colors[lo][2] + colors[hi][2]) / 2) * 255);
   return [r, g, b];
 }
 
@@ -19466,21 +19466,17 @@ function qualitative(x, colors) {
   while (x > (idx + 1) / (colors.length - 0)) {
     idx++;
   }
-  let r = Math.round(colors[idx][0] * 255);
-  let g = Math.round(colors[idx][1] * 255);
-  let b = Math.round(colors[idx][2] * 255);
+  const r = Math.round(colors[idx][0] * 255);
+  const g = Math.round(colors[idx][1] * 255);
+  const b = Math.round(colors[idx][2] * 255);
   return [r, g, b];
 }
 
 function partial(name) {
   if (name.endsWith("_r")) {
-    return function (x) {
-      return evaluate_cmap(x, name.substring(0, name.length - 2), true);
-    };
+    return (x) => evaluate_cmap(x, name.substring(0, name.length - 2), true);
   } else {
-    return function (x) {
-      return evaluate_cmap(x, name, false);
-    };
+    return (x) => evaluate_cmap(x, name, false);
   }
 }
 

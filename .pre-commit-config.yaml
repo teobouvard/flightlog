@@ -19,3 +19,9 @@ repos:
       - id: fmt
       - id: cargo-check
       - id: clippy
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v0.5.0
+    hooks:
+      - id: biome-check
+        entry: biome check --write --files-ignore-unknown=true --no-errors-on-unmatched --config-path web/biome.json
+        additional_dependencies: ["@biomejs/biome@1.9.4"]
