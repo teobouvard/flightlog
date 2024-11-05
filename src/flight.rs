@@ -128,7 +128,7 @@ impl Flight {
                 states[i] = TrackState::Climbing;
             } else if squared_speeds[i] < 1.0 {
                 states[i] = TrackState::Landed;
-            } else if glide_ratios[i] != f64::INFINITY {
+            } else if glide_ratios[i] != f64::INFINITY && !glide_ratios[i].is_nan() {
                 glide_ratios_during_glide.push(glide_ratios[i]);
             }
         }
