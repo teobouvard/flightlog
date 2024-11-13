@@ -1,8 +1,9 @@
 mod datetime;
+mod entry;
 mod flight;
 mod flightlog;
 mod igc;
-mod ui;
+mod index;
 use log::info;
 
 use std::fs::File;
@@ -10,10 +11,10 @@ use std::path::PathBuf;
 
 use chrono::NaiveDate;
 use clap::{Parser, Subcommand};
-use flightlog::FlightLog;
 use glob::{glob_with, MatchOptions};
-use ui::FlightlogEntry;
 
+use crate::entry::FlightlogEntry;
+use crate::flightlog::FlightLog;
 use crate::{flight::Flight, igc::IgcFile};
 
 #[derive(Parser)]
@@ -40,7 +41,7 @@ enum Commands {
 fn cmd_compile(input: PathBuf, output: PathBuf) {
     let mut date_current = NaiveDate::default();
     let mut date_index = 0;
-    let mut flights: Vec<FlightlogEntry> = vec![];
+    let mut entries: Vec<FlightlogEntry> = vec![];
 
     for entry in glob_with(
         input
@@ -67,22 +68,21 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
         }
         let entry = FlightlogEntry::new(date_index, flight);
         entry.render(&output);
-        flights.push(entry);
+        entries.push(entry);
     }
 
-    let flightlog = FlightLog::new(flights);
+    let flightlog = FlightLog::new(entries);
     flightlog.render(&output);
     info!(
         "Total duration: {}",
-        flightlog.get_total_flight_duration().to_seconds()
+        serde_json::to_string(&flightlog.get_total_flight_duration()).unwrap()
     );
 }
 
 fn main() {
     env_logger::init();
-    let args = Args::parse();
 
-    match args.command {
+    match Args::parse().command {
         Some(Commands::Compile { input, output }) => cmd_compile(input, output),
         None => panic!("No command provided"),
     }

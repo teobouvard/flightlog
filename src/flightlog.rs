@@ -1,25 +1,15 @@
-use chrono::{DateTime, Utc};
 use serde::Serialize;
+
+use crate::{
+    datetime::Duration,
+    entry::FlightlogEntry,
+    index::{FlightLogIndex, FlightLogIndexEntry},
+};
 use std::{
     fs::{self, File},
     io::{BufWriter, Write},
     path::Path,
 };
-
-use crate::datetime::Duration;
-use crate::ui::FlightlogEntry;
-
-#[derive(Serialize)]
-pub struct FlightLogIndexEntry {
-    pub date: DateTime<Utc>,
-    pub name: String,
-    pub duration_s: i64,
-}
-
-#[derive(Serialize)]
-pub struct FlightLogIndex {
-    pub entries: Vec<FlightLogIndexEntry>,
-}
 
 #[derive(Serialize)]
 pub struct FlightLog {
@@ -31,8 +21,8 @@ impl FlightLog {
         Self { entries }
     }
 
-    pub fn get_total_flight_duration(self) -> Duration {
-        self.entries.into_iter().map(|e| e.flight.duration).sum()
+    pub fn get_total_flight_duration(&self) -> Duration {
+        self.entries.iter().map(|e| e.flight.duration).sum()
     }
 
     pub fn render(&self, output: &Path) {
