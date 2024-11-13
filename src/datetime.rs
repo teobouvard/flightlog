@@ -2,7 +2,7 @@ use std::iter::Sum;
 
 use serde::Serialize;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Duration {
     inner: chrono::Duration,
 }
@@ -18,7 +18,7 @@ impl Duration {
         }
     }
 
-    pub fn to_seconds(&self) -> i64 {
+    pub fn to_seconds(self) -> i64 {
         self.inner.num_seconds()
     }
 }
