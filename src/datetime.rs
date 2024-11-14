@@ -1,4 +1,4 @@
-use std::iter::Sum;
+use std::{iter::Sum, ops::AddAssign};
 
 use serde::Serialize;
 
@@ -10,6 +10,12 @@ pub struct Duration {
 impl Duration {
     pub fn new(inner: chrono::Duration) -> Self {
         Self { inner }
+    }
+
+    pub fn zero() -> Self {
+        Self {
+            inner: chrono::Duration::zero(),
+        }
     }
 
     pub fn from_seconds(secs: i64) -> Self {
@@ -38,5 +44,11 @@ impl Serialize for Duration {
 impl Sum for Duration {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
         Duration::new(iter.map(|d| d.inner).sum::<chrono::Duration>())
+    }
+}
+
+impl AddAssign for Duration {
+    fn add_assign(&mut self, rhs: Self) {
+        self.inner += rhs.inner
     }
 }

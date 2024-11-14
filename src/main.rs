@@ -2,6 +2,7 @@ mod datetime;
 mod entry;
 mod flight;
 mod flightlog;
+mod hours;
 mod igc;
 mod index;
 use log::info;
