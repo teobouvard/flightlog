@@ -82,13 +82,13 @@ impl IgcFile {
             },
             None => {
                 if let Some(date) = record.strip_prefix("HFDTE") {
-                    return IgcHeaderEntry::Date {
+                    IgcHeaderEntry::Date {
                         date: NaiveDate::parse_and_remainder(date, "%d%m%y")
                             .unwrap_or_else(|err| {
                                 panic!("Could not parse date from header {}: {}", record, err)
                             })
                             .0,
-                    };
+                    }
                 } else {
                     IgcHeaderEntry::Unsupported
                 }
