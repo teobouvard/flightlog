@@ -118,9 +118,8 @@ impl Flight {
         glide_ratios.insert(0, 0.0);
         glide_ratios.push(0.0);
 
-        let mut states: Vec<TrackState> = std::iter::repeat(TrackState::Gliding)
-            .take(track.fixes.len())
-            .collect();
+        let mut states: Vec<TrackState> =
+            std::iter::repeat_n(TrackState::Gliding, track.fixes.len()).collect();
 
         let mut glide_ratios_during_glide = vec![];
         for (i, _) in track.fixes.iter().enumerate() {
