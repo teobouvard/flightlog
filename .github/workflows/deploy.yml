@@ -30,6 +30,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          lfs: true
       - name: Setup pages
         id: pages
         uses: actions/configure-pages@v5
