@@ -31,6 +31,7 @@ function FlightList({ entries }) {
       <table class="w-full text-nowrap divide-y divide-gray-500">
         <thead class="bg-gray-700 ">
           <tr>
+            <th class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left"></th>
             <th
               class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left cursor-pointer"
               onClick={() => handleSort("date")}
@@ -51,6 +52,7 @@ function FlightList({ entries }) {
         <tbody>
           {sortedEntries.map((entry) => (
             <tr key={entry.id} class="hover:bg-gray-700 bg-gray-800">
+              <td class="px-4 py-1 text-gray-500 font-mono">#{entry.idx}</td>
               <td class="px-4 py-1 text-gray-200 font-mono">{entry.date}</td>
               <td class="px-4 py-1 text-gray-200 font-mono">
                 {entry.duration}

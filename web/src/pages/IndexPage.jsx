@@ -8,9 +8,10 @@ function IndexPage() {
 
   useEffect(() => {
     setEntries(
-      data.entries.map(({ name, duration_s, ...params }) => {
+      data.entries.map(({ name, duration_s, ...params }, idx) => {
         return {
           id: name,
+          idx: idx + 1,
           duration: new Date(duration_s * 1000).toISOString().slice(11, 19),
           ...params,
         };
