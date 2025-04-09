@@ -4,7 +4,6 @@ import maplibregl from "maplibre-gl";
 import PropTypes from "prop-types";
 import { useEffect, useRef } from "react";
 
-import "./FlightMap.css";
 import { mapStyle, skyStyle } from "./MapStyle";
 import { plasma_r } from "./colormap";
 
@@ -142,8 +141,8 @@ function FlightMap({
   }, [flight, currentPlayerPosition, playerTrailLength, displayFullTrack]);
 
   return (
-    <div className="map-wrap">
-      <div ref={mapContainer} className="map" />
+    <div className="flex-grow">
+      <div ref={mapContainer} className="w-full h-full" />
     </div>
   );
 }

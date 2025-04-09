@@ -1,36 +1,43 @@
-import { DataGrid } from "@mui/x-data-grid";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 
-const columns = [
-  {
-    field: "date",
-    headerName: "date",
-    flex: 1,
-  },
-  { field: "duration", headerName: "duration", flex: 1 },
-  {
-    field: "none",
-    headerName: "track",
-    renderCell: ({ row }) => <Link to={`/flight/${row.id}`}>view</Link>,
-    flex: 0.5,
-  },
-];
-
 function FlightList({ entries }) {
   return (
-    <DataGrid
-      columns={columns}
-      rows={entries}
-      disableColumnResize={true}
-      disableColumnMenu={false}
-      disableRowSelectionOnClick={true}
-      initialState={{
-        sorting: {
-          sortModel: [{ field: "date", sort: "desc" }],
-        },
-      }}
-    />
+    <div class="overflow-x-auto rounded-md">
+      <table class="w-full text-nowrap divide-y divide-gray-500">
+        <thead class="bg-gray-800 ">
+          <tr>
+            <th class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left">
+              Date
+            </th>
+            <th class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left">
+              Duration
+            </th>
+            <th class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left">
+              Track
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map((entry) => (
+            <tr key={entry.id} class="hover:bg-gray-800">
+              <td class="px-4 py-1 text-gray-200 font-mono">{entry.date}</td>
+              <td class="px-4 py-1 text-gray-200 font-mono">
+                {entry.duration}
+              </td>
+              <td class="px-4 py-1 text-gray-200 font-mono">
+                <Link
+                  to={`/flight/${entry.id}`}
+                  class="text-blue-500 hover:underline"
+                >
+                  view
+                </Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

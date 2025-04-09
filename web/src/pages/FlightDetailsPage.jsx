@@ -2,7 +2,6 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import "./FlightDetailsPage.css";
 import { FlightMap } from "./FlightMap";
 
 const dataFiles = import.meta.glob("../../data/**/*.json");
@@ -80,8 +79,8 @@ function FlightDetailsPage() {
   if (data.error) return <p>{data.error}</p>;
 
   return (
-    <div className="wrapper">
-      <h1>{data.flight.date}</h1>
+    <div className="flex flex-col w-full h-screen">
+      <h1 class="text-xl font-bold">{data.flight.date}</h1>
       <p>{data.flight.duration}</p>
       <button
         type="button"

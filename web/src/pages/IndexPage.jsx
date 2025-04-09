@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import data from "../../data/index.json";
 import FlightList from "./FlightList";
-import "./IndexPage.css";
 
 function IndexPage() {
   const [entries, setEntries] = useState([]);
@@ -20,12 +19,11 @@ function IndexPage() {
   }, []);
 
   return (
-    <div>
-      <h1 className="main-title">flightlog</h1>
-      <div className="main-content">
+    <>
+      <div className="m-auto p-4 w-full md:w-lg">
         <FlightList entries={entries} />
       </div>
-    </div>
+    </>
   );
 }
 
