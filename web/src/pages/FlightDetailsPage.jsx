@@ -20,6 +20,7 @@ function FlightDetailsPage() {
   const { id } = useParams();
   const filename = mapIdToFilename(id);
   const [data, setData] = useState(null);
+  const [placeName, setPlaceName] = useState("");
   const [currentPlayerPosition, setCurrentPlayerPosition] = useState(0);
   const [animationSpeed, setAnimationSpeed] = useState(50);
   const [playerTrailLength, setPlayerTrailLength] = useState(100);
@@ -43,6 +44,31 @@ function FlightDetailsPage() {
 
     loadFile();
   }, [filename]);
+
+  // Call Nominatim API to get the address of the flight.
+  useEffect(() => {
+    if (data && data.flight) {
+      const coordinates = data.flight.geojson.coordinates[0];
+      const lat = coordinates[1];
+      const lon = coordinates[0];
+      const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data && data.address) {
+            console.log(data);
+            setPlaceName(
+              `${data.address.village || data.address.town || data.address.city || data.address.municipality}, ${data.address.country}`,
+            );
+          } else {
+            setPlaceName("Unknown location");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching address:", error);
+        });
+    }
+  }, [data]);
 
   const handleSliderChange = (value) => {
     setDisplayFullTrack(false);
@@ -93,6 +119,9 @@ function FlightDetailsPage() {
     <div className="flex flex-col w-full space-y-4">
       <div className="flex flex-row space-x-4 items-baseline">
         <h1 class="text-xl font-bold font-mono">{data.flight.date}</h1>
+        <span class="font-bold font-mono">|</span>
+        <p class="font-mono text-white">{placeName}</p>
+        <span class="font-bold font-mono">|</span>
         <p class="font-mono text-gray-400">{data.flight.duration}</p>
       </div>
       <div className="flex flex-row space-x-4">
