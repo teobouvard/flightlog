@@ -141,7 +141,7 @@ function FlightMap({
   }, [flight, currentPlayerPosition, playerTrailLength, displayFullTrack]);
 
   return (
-    <div className="flex-grow">
+    <div className="flex-grow h-[90vh]">
       <div ref={mapContainer} className="w-full h-full" />
     </div>
   );

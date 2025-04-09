@@ -79,27 +79,37 @@ function FlightDetailsPage() {
   if (data.error) return <p>{data.error}</p>;
 
   return (
-    <div className="flex flex-col w-full h-screen">
-      <h1 class="text-xl font-bold">{data.flight.date}</h1>
-      <p>{data.flight.duration}</p>
-      <button
-        type="button"
-        disabled={displayFullTrack}
-        onClick={handleDisplayFullTrackButtonClick}
-      >
-        Display full track
-      </button>
-      <button type="button" onClick={() => handlePlayButtonClick()}>
-        {ticker ? "Pause" : "Play"}
-      </button>
-      <div>
-        <p>Center map on current position</p>
-        <input
-          type="checkbox"
-          checked={centerMapOnPosition}
-          onChange={() => setCenterMapOnPosition(!centerMapOnPosition)}
-        />
+    <div className="flex flex-col w-full space-y-4">
+      <div className="flex flex-row space-x-4 items-baseline">
+        <h1 class="text-xl font-bold font-mono">{data.flight.date}</h1>
+        <p class="font-mono text-gray-400">{data.flight.duration}</p>
       </div>
+      <div className="flex flex-row space-x-4">
+        <button
+          class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+          type="button"
+          onClick={() => handlePlayButtonClick()}
+        >
+          {ticker ? "Pause" : "Play"}
+        </button>
+        <button
+          class="bg-gray-700 enabled:hover:bg-gray-600 text-white font-bold py-2 px-4 rounded disabled:hidden"
+          type="button"
+          disabled={displayFullTrack}
+          onClick={handleDisplayFullTrackButtonClick}
+        >
+          Display full track
+        </button>
+        <div class="flex flex-row  font-bold py-2 px-4 rounded space-x-2">
+          <input
+            type="checkbox"
+            checked={centerMapOnPosition}
+            onChange={() => setCenterMapOnPosition(!centerMapOnPosition)}
+          />
+          <p>Follow</p>
+        </div>
+      </div>
+
       <input
         type="range"
         min="0"
