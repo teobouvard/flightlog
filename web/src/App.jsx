@@ -7,7 +7,7 @@ import IndexPage from "./pages/IndexPage";
 function App() {
   return (
     <Router>
-      <div class="bg-gray-900 text-white flex flex-col">
+      <div class="bg-gray-900 text-white flex flex-col min-h-screen">
         <Header />
         <div class="w-11/12 m-auto p-4">
           <Routes>
