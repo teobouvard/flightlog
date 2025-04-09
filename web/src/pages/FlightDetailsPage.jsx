@@ -56,9 +56,8 @@ function FlightDetailsPage() {
         .then((response) => response.json())
         .then((data) => {
           if (data && data.address) {
-            console.log(data);
             setPlaceName(
-              `${data.address.village || data.address.town || data.address.city || data.address.municipality}, ${data.address.country}`,
+              `${data.address.village || data.address.town || data.address.city || data.address.municipality || data.address.county}, ${data.address.country}`,
             );
           } else {
             setPlaceName("Unknown location");
