@@ -5,7 +5,7 @@ function FlightList({ entries }) {
   return (
     <div class="overflow-x-auto rounded-md">
       <table class="w-full text-nowrap divide-y divide-gray-500">
-        <thead class="bg-gray-800 ">
+        <thead class="bg-gray-700 ">
           <tr>
             <th class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left">
               Date
@@ -20,7 +20,7 @@ function FlightList({ entries }) {
         </thead>
         <tbody>
           {entries.map((entry) => (
-            <tr key={entry.id} class="hover:bg-gray-800">
+            <tr key={entry.id} class="hover:bg-gray-700 bg-gray-800">
               <td class="px-4 py-1 text-gray-200 font-mono">{entry.date}</td>
               <td class="px-4 py-1 text-gray-200 font-mono">
                 {entry.duration}

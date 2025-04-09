@@ -20,7 +20,7 @@ function IndexPage() {
 
   return (
     <>
-      <div className="m-auto p-4 w-full md:w-lg">
+      <div className="m-auto w-full md:w-lg">
         <FlightList entries={entries} />
       </div>
     </>
