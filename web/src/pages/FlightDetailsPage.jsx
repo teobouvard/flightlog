@@ -1,6 +1,6 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { FlightMap } from "./FlightMap";
 
@@ -37,7 +37,7 @@ function FlightDetailsPage() {
         const fileContents = await dataFiles[filename]();
         setData(fileContents);
       } else {
-        setData({ error: "File not found" });
+        setData({ error: "Flight not found" });
       }
     };
 
@@ -76,7 +76,18 @@ function FlightDetailsPage() {
   };
 
   if (!data) return <p>Loading...</p>;
-  if (data.error) return <p>{data.error}</p>;
+  if (data.error)
+    return (
+      <div class="flex flex-col m-auto w-fit space-y-4 text-center">
+        <p class="font-bold text-red-500">{data.error}</p>
+        <Link
+          class="bg-blue-600 hover:bg-blue-700 rounded px-4 py-3 font-bold"
+          to={"/"}
+        >
+          Go back to flight list
+        </Link>
+      </div>
+    );
 
   return (
     <div className="flex flex-col w-full space-y-4">
