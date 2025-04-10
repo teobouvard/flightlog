@@ -31,20 +31,22 @@ function FlightList({ entries }) {
       <table class="w-full text-nowrap divide-y divide-gray-500">
         <thead class="bg-gray-700 ">
           <tr>
-            <th class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left"></th>
+            <th class="text-xs font-medium tracking-wider uppercase text-gray-400 px-4 py-3 text-left">
+              N°
+            </th>
             <th
-              class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left cursor-pointer"
+              class="text-xs font-medium tracking-wider uppercase text-gray-400 px-4 py-3 text-left cursor-pointer"
               onClick={() => handleSort("date")}
             >
               Date {sortColumn === "date" ? sortOrder : ""}
             </th>
             <th
-              class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left cursor-pointer"
+              class="text-xs font-medium tracking-wider uppercase text-gray-400 px-4 py-3 text-left cursor-pointer"
               onClick={() => handleSort("duration")}
             >
               Duration {sortColumn === "duration" ? sortOrder : ""}
             </th>
-            <th class="text-xs font-medium tracking-winder uppercase text-gray-400 px-4 py-3 text-left">
+            <th class="text-xs font-medium tracking-wider uppercase text-gray-400 px-4 py-3 text-left">
               Track
             </th>
           </tr>
