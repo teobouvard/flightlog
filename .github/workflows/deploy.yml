@@ -1,7 +1,10 @@
-name: deploy
+name: Build and Deploy
 
 on:
   push:
+    branches:
+      - develop
+  pull_request:
     branches:
       - develop
 
@@ -12,7 +15,7 @@ permissions:
   id-token: write
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+# However, do NOT cancel in-progress runs as we want to allow these deployments to complete.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -22,19 +25,14 @@ env:
   NODE_OPTIONS: --max-old-space-size=16384
 
 jobs:
-  deploy:
-    environment:
-        name: github-pages
-        url: ${{ steps.deployment.outputs.page_url }}
+  build:
+    name: Build project
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           lfs: true
-      - name: Setup pages
-        id: pages
-        uses: actions/configure-pages@v5
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -51,10 +49,24 @@ jobs:
           cd web
           npm ci
           npm run build
-      - name: Upload artifacts
+      - name: Upload build artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "web/dist"
+          name: pages-artifact
+          path: web/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup pages
+        id: pages
+        uses: actions/configure-pages@v5
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
