@@ -15,7 +15,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@tailwindcss/vite": "^4.1.7",
-    "deck.gl": "^9.1.11",
+    "deck.gl": "^9.1.12",
     "maplibre-gl": "^5.4.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
