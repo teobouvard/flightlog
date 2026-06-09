@@ -3,7 +3,7 @@ use std::fmt::Display;
 use chrono::{DateTime, NaiveDate, NaiveDateTime, Utc};
 use geojson::GeoJson;
 use geojson::Value::LineString;
-use log::info;
+use log::{info, warn};
 use serde::Serialize;
 
 use crate::datetime::Duration;
@@ -138,6 +138,19 @@ impl Flight {
             info!("Median glide ratio: {}", glide_ratios_during_glide[mid]);
         }
 
+        if squared_speeds.len() > 10 {
+            squared_speeds.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            let mid = squared_speeds.len() / 2;
+            let median_speed = squared_speeds[mid].sqrt();
+            info!("Median speed: {}", median_speed);
+            if !(Flight::MIN_FLYING_SPEED..=15.0).contains(&median_speed) {
+                warn!(
+                    "{} suspicious median speed: {}",
+                    track.filename, median_speed
+                );
+            }
+        }
+
         states
     }
 
@@ -145,7 +158,16 @@ impl Flight {
         let time = (end.ts - start.ts).num_seconds() as f64;
         let distance_h = start.distance(end);
         let distance_v = (end.alt - start.alt).abs() as f64;
-        (distance_v * distance_v + distance_h * distance_h) / time
+        let speed = (distance_v * distance_v + distance_h * distance_h) / time;
+        if speed.is_nan() || speed.is_infinite() {
+            info!(
+                "Invalid speed between {} and {}: {}",
+                start.ts, end.ts, speed
+            );
+            0.0
+        } else {
+            speed
+        }
     }
 }
 

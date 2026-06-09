@@ -60,7 +60,7 @@ fn cmd_compile(input: PathBuf, output: PathBuf) {
         info!("Processing {}", filename.display());
         let file = File::open(&filename).expect("Could not open file");
 
-        let flight = Flight::new(IgcFile::new(file));
+        let flight = Flight::new(IgcFile::new(file, filename.to_string_lossy().to_string()));
         if flight.date == date_current {
             date_index += 1;
         } else {

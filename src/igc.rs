@@ -34,12 +34,13 @@ impl IgcFix {
 
 #[derive(Debug)]
 pub struct IgcFile {
+    pub filename: String,
     pub header: Vec<IgcHeaderEntry>,
     pub fixes: Vec<IgcFix>,
 }
 
 impl IgcFile {
-    pub fn new(file: File) -> Self {
+    pub fn new(file: File, filename: String) -> Self {
         let mut header = vec![];
         let mut fixes = vec![];
 
@@ -53,7 +54,11 @@ impl IgcFile {
             }
         }
 
-        Self { header, fixes }
+        Self {
+            filename,
+            header,
+            fixes,
+        }
     }
 
     pub fn get_date(&self) -> Option<NaiveDate> {
